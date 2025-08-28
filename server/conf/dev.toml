@@ -1,0 +1,37 @@
+[mysql]
+master="root:123456@tcp(127.0.0.1:3306)/songcang?charset=utf8mb4&parseTime=true&loc=Local"
+use_master_slave=false
+
+[redis]
+addrs=["127.0.0.1:6379"]
+db_index = 10
+enable_tls = false
+
+[queen]
+addres=["127.0.0.1:6379"]
+db_index = 11
+enable_tls = false
+
+[websrv]
+ip="0.0.0.0"
+port= 10001
+
+[logger]
+filename = "logs/app.log"
+maxsize = 60
+maxbackups = 5
+maxage = 7
+compress = true
+
+[wechat]
+# 正式
+#app_id= "wx853ce78c0f3f4638"
+#app_secret="d5644b59359e341f388beaa074d2cfad"
+# 测试
+app_id= "wxb19e241468ef01a8"
+app_secret="9b994ba4b9165bedb043d06803185774"
+
+[global]
+version = "0.1"
+app_name = "songcang"
+redis_key_prefix = "songcang"
