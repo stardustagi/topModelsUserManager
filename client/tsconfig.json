@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "strict": false,
     "strictFunctionTypes": false,
     "noImplicitThis": true,
@@ -23,20 +23,25 @@
       "DOM"
     ],
     "paths": {
-      "@/*": [
-        "src/*"
-      ],
-      "@build/*": [
-        "build/*"
-      ]
+      "@/*": ["src/*"],
+      "@build/*": ["build/*"],
+      "@plugins/*": ["src/plugins/*"],
+      "vue": ["node_modules/vue/dist/vue.d.ts"],
+      "vue-i18n": ["node_modules/vue-i18n/dist/vue-i18n.d.ts"],
+      "vue-router": ["node_modules/vue-router/dist/vue-router.d.ts"],
+      "~icons/*": ["src/assets/icons/*"]
     },
     "types": [
       "node",
       "vite/client",
       "element-plus/global",
-      "@pureadmin/table/volar",
       "unplugin-icons/types/vue",
-      "@pureadmin/descriptions/volar"
+      "@pureadmin/descriptions/volar",
+      "vue",
+      "vue-i18n",
+      "vue-router",
+      "@vueuse/core",
+      "@pureadmin/utils"
     ]
   },
   "include": [

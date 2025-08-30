@@ -1,100 +1,3 @@
-<script setup lang="ts">
-import { useI18n } from "vue-i18n";
-import Motion from "./utils/motion";
-import { useRouter } from "vue-router";
-import { message } from "@/utils/message";
-import { loginRules } from "./utils/rule";
-import { ref, reactive, toRaw } from "vue";
-import { debounce } from "@pureadmin/utils";
-import { useNav } from "@/layout/hooks/useNav";
-import { useEventListener } from "@vueuse/core";
-import type { FormInstance } from "element-plus";
-import { $t, transformI18n } from "@/plugins/i18n";
-import { useLayout } from "@/layout/hooks/useLayout";
-import { useUserStoreHook } from "@/store/modules/user";
-import { initRouter, getTopMenu } from "@/router/utils";
-import { bg, avatar, illustration } from "./utils/static";
-import { useRenderIcon } from "@/components/ReIcon/src/hooks";
-import { useTranslationLang } from "@/layout/hooks/useTranslationLang";
-import { useDataThemeChange } from "@/layout/hooks/useDataThemeChange";
-
-import dayIcon from "@/assets/svg/day.svg?component";
-import darkIcon from "@/assets/svg/dark.svg?component";
-import globalization from "@/assets/svg/globalization.svg?component";
-import Lock from "~icons/ri/lock-fill";
-import Check from "~icons/ep/check";
-import User from "~icons/ri/user-3-fill";
-
-defineOptions({
-  name: "Login"
-});
-
-const router = useRouter();
-const loading = ref(false);
-const disabled = ref(false);
-const ruleFormRef = ref<FormInstance>();
-
-const { initStorage } = useLayout();
-initStorage();
-
-const { t } = useI18n();
-const { dataTheme, overallStyle, dataThemeChange } = useDataThemeChange();
-dataThemeChange(overallStyle.value);
-const { title, getDropdownItemStyle, getDropdownItemClass } = useNav();
-const { locale, translationCh, translationEn } = useTranslationLang();
-
-const ruleForm = reactive({
-  username: "admin",
-  password: "admin123"
-});
-
-const onLogin = async (formEl: FormInstance | undefined) => {
-  if (!formEl) return;
-  await formEl.validate(valid => {
-    if (valid) {
-      loading.value = true;
-      useUserStoreHook()
-        .loginByUsername({
-          username: ruleForm.username,
-          password: ruleForm.password
-        })
-        .then(res => {
-          if (res.success) {
-            // 获取后端路由
-            return initRouter().then(() => {
-              disabled.value = true;
-              router
-                .push(getTopMenu(true).path)
-                .then(() => {
-                  message(t("login.pureLoginSuccess"), { type: "success" });
-                })
-                .finally(() => (disabled.value = false));
-            });
-          } else {
-            message(t("login.pureLoginFail"), { type: "error" });
-          }
-        })
-        .finally(() => (loading.value = false));
-    }
-  });
-};
-
-const immediateDebounce: any = debounce(
-  formRef => onLogin(formRef),
-  1000,
-  true
-);
-
-useEventListener(document, "keydown", ({ code }) => {
-  if (
-    ["Enter", "NumpadEnter"].includes(code) &&
-    !disabled.value &&
-    !loading.value
-  )
-    immediateDebounce(ruleFormRef.value);
-});
-</script>
-
 <template>
   <div class="select-none">
     <img :src="bg" class="wave" />
@@ -146,12 +49,13 @@ useEventListener(document, "keydown", ({ code }) => {
       </div>
       <div class="login-box">
         <div class="login-form">
-          <avatar class="avatar" />
+          <!-- <avatar class="avatar" /> -->
           <Motion>
             <h2 class="outline-hidden">{{ title }}</h2>
           </Motion>
 
           <el-form
+            v-if="currentPage === 0"
             ref="ruleFormRef"
             :model="ruleForm"
             :rules="loginRules"
@@ -189,6 +93,22 @@ useEventListener(document, "keydown", ({ code }) => {
               </el-form-item>
             </Motion>
 
+            <!--验证码-->
+            <Motion :delay="200">
+              <el-form-item prop="verifyCode">
+                <el-input
+                  v-model="ruleForm.verifyCode"
+                  clearable
+                  :placeholder="t('login.pureVerifyCode')"
+                  :prefix-icon="useRenderIcon(Keyhole)"
+                >
+                  <template v-slot:append>
+                    <ReImageVerify v-model:code="imgCode" />
+                  </template>
+                </el-input>
+              </el-form-item>
+            </Motion>
+
             <Motion :delay="250">
               <el-button
                 class="w-full mt-4!"
@@ -201,12 +121,134 @@ useEventListener(document, "keydown", ({ code }) => {
                 {{ t("login.pureLogin") }}
               </el-button>
             </Motion>
+
+            <Motion :delay="300">
+              <el-form-item>
+                <div class="w-full h-[20px] flex justify-between items-center">
+                  <el-button
+                    class="w-full mt-4!"
+                    size="default"
+                    @click="useUserStoreHook().SET_CURRENTPAGE(3)"
+                  >
+                    {{ t('login.pureRegister') }}
+                  </el-button>
+                </div>
+              </el-form-item>
+            </Motion>
           </el-form>
+
+          <!-- 注册 -->
+          <LoginRegist v-if="currentPage === 3" />
         </div>
       </div>
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { useI18n } from "vue-i18n";
+import Motion from "./utils/motion";
+import { useRouter } from "vue-router";
+import { message } from "@/utils/message";
+import { loginRules } from "./utils/rule";
+import { ref, reactive, toRaw, computed } from "vue";
+import { debounce } from "@pureadmin/utils";
+import { useNav } from "@/layout/hooks/useNav";
+import { useEventListener } from "@vueuse/core";
+import type { FormInstance } from "element-plus";
+import { $t, transformI18n } from "@/plugins/i18n";
+import { useLayout } from "@/layout/hooks/useLayout";
+import { useUserStoreHook } from "@/store/modules/user";
+import { initRouter, getTopMenu } from "@/router/utils";
+import { bg, avatar, illustration } from "./utils/static";
+import { useRenderIcon } from "@/components/ReIcon/src/hooks";
+import { useTranslationLang } from "@/layout/hooks/useTranslationLang";
+import { useDataThemeChange } from "@/layout/hooks/useDataThemeChange";
+import { ReImageVerify } from "@/components/ReImageVerify";
+// import LoginRegist from "@/views/login/components/LoginRegist.vue";
+import {LoginRegist} from "./components/LoginRegist.vue";
+
+import dayIcon from "@/assets/svg/day.svg?component";
+import darkIcon from "@/assets/svg/dark.svg?component";
+import globalization from "@/assets/svg/globalization.svg?component";
+import Keyhole from "~icons/ri/shield-keyhole-line";
+import Lock from "~icons/ri/lock-fill";
+import Check from "~icons/ep/check";
+import User from "~icons/ri/user-3-fill";
+
+defineOptions({
+  name: "Login"
+});
+const imgCode = ref("");
+const router = useRouter();
+const loading = ref(false);
+const disabled = ref(false);
+const ruleFormRef = ref<FormInstance>();
+
+const currentPage = computed(() => {
+  return useUserStoreHook().currentPage;
+});
+const { initStorage } = useLayout();
+initStorage();
+
+const { t } = useI18n();
+const { dataTheme, overallStyle, dataThemeChange } = useDataThemeChange();
+dataThemeChange(overallStyle.value);
+const { title, getDropdownItemStyle, getDropdownItemClass } = useNav();
+const { locale, translationCh, translationEn } = useTranslationLang();
+
+const ruleForm = reactive({
+  username: "admin",
+  password: "admin123",
+  verifyCode: ""
+});
+
+const onLogin = async (formEl: FormInstance | undefined) => {
+  if (!formEl) return;
+  await formEl.validate(valid => {
+    if (valid) {
+      loading.value = true;
+      useUserStoreHook()
+        .loginByUsername({
+          username: ruleForm.username,
+          password: ruleForm.password
+        })
+        .then(res => {
+          if (res.success) {
+            // 获取后端路由
+            return initRouter().then(() => {
+              disabled.value = true;
+              router
+                .push(getTopMenu(true).path)
+                .then(() => {
+                  message(t("login.pureLoginSuccess"), { type: "success" });
+                })
+                .finally(() => (disabled.value = false));
+            });
+          } else {
+            message(t("login.pureLoginFail"), { type: "error" });
+          }
+        })
+        .finally(() => (loading.value = false));
+    }
+  });
+};
+
+const immediateDebounce: any = debounce(
+  formRef => onLogin(formRef),
+  1000,
+  true
+);
+
+useEventListener(document, "keydown", ({ code }) => {
+  if (
+    ["Enter", "NumpadEnter"].includes(code) &&
+    !disabled.value &&
+    !loading.value
+  )
+    immediateDebounce(ruleFormRef.value);
+});
+</script>
 
 <style scoped>
 @import url("@/style/login.css");
