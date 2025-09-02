@@ -3,13 +3,13 @@
     <img :src="bg" class="wave" />
     <div class="flex-c absolute right-5 top-3">
       <!-- 主题 -->
-      <el-switch
+      <!-- <el-switch
         v-model="dataTheme"
         inline-prompt
         :active-icon="dayIcon"
         :inactive-icon="darkIcon"
         @change="dataThemeChange"
-      />
+      /> -->
       <!-- 国际化 -->
       <el-dropdown trigger="click">
         <globalization
@@ -166,7 +166,7 @@ import { useTranslationLang } from "@/layout/hooks/useTranslationLang";
 import { useDataThemeChange } from "@/layout/hooks/useDataThemeChange";
 import { ReImageVerify } from "@/components/ReImageVerify";
 // import LoginRegist from "@/views/login/components/LoginRegist.vue";
-import {LoginRegist} from "./components/LoginRegist.vue";
+import LoginRegist from "./components/LoginRegist.vue";
 
 import dayIcon from "@/assets/svg/day.svg?component";
 import darkIcon from "@/assets/svg/dark.svg?component";

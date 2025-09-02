@@ -7,7 +7,8 @@ export default {
     icon: "ri/information-line",
     // showLink: false,
     title: $t("menus.pureAbnormal"),
-    rank: 9
+    rank: 9,
+    showLink:false,
   },
   children: [
     {
@@ -16,7 +17,7 @@ export default {
       component: () => import("@/views/error/403.vue"),
       meta: {
         title: $t("menus.pureFourZeroOne")
-      }
+      },
     },
     {
       path: "/error/404",

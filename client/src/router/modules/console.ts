@@ -1,28 +1,20 @@
 import { $t } from "@/plugins/i18n";
 
 export default {
-  path: "/person_center",
-  redirect: "/person_center/package/index",
+  path: "/cansole",
+  redirect: "/console/dashboard",
   meta: {
     icon: "ri/information-line",
-    title: "个人中心",
-    rank: 9
+    title: "控制台",
+    rank: 10
   },
   children: [
     {
-      path: "/person_center/wallet",
-      name: "Wallet",
-      component: () => import("@/views/person_center/wallet/index.vue"),
+      path: "/console/dashboard",
+      name: "Dashboard",
+      component: () => import("@/views/console/dashboard.vue"),
       meta: {
-        title: "钱包"
-      }
-    },
-    {
-      path: "/person_center/set",
-      name: "Set",
-      component: () => import("@/views/person_center/set/index.vue"),
-      meta: {
-        title: "个人设置"
+        title: "数据看板"
       }
     }
   ]

@@ -16,8 +16,9 @@ export default {
       name: "Wallet",
       component: () => import("@/views/person_center/wallet/index.vue"),
       meta: {
-        title: "钱包"
-      }
+        title: "钱包",
+        roles:["admin"],
+      },
     },
     {
       path: "/person_center/set",

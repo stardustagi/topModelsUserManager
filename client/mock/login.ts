@@ -14,7 +14,7 @@ export default defineFakeRoute([
             username: "admin",
             nickname: "小铭",
             // 一个用户可能有多个角色
-            roles: ["admin"],
+            roles: ["admin","editor"],
             // 按钮级别权限
             permissions: ["*:*:*"],
             accessToken: "eyJhbGciOiJIUzUxMiJ9.admin",
