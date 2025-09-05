@@ -5,32 +5,12 @@
     :rules="updateRules"
     size="large"
   >
-    <Motion>
-      <el-form-item
-        :rules="[
-          {
-            required: true,
-            message: transformI18n($t('login.pureUsernameReg')),
-            trigger: 'blur'
-          }
-        ]"
-        prop="username"
-      >
-        <el-input
-          v-model="ruleForm.username"
-          clearable
-          :placeholder="t('login.pureUsername')"
-          :prefix-icon="useRenderIcon(User)"
-        />
-      </el-form-item>
-    </Motion>
-
     <Motion :delay="100">
       <el-form-item prop="phone">
         <el-input
           v-model="ruleForm.phone"
           clearable
-          :placeholder="t('login.purePhone')"
+          placeholder="邮箱"
           :prefix-icon="useRenderIcon(Iphone)"
         />
       </el-form-item>
@@ -42,7 +22,7 @@
           <el-input
             v-model="ruleForm.verifyCode"
             clearable
-            :placeholder="t('login.pureSmsVerifyCode')"
+            placeholder="邮箱验证码"
             :prefix-icon="useRenderIcon(Keyhole)"
           />
           <el-button
@@ -60,31 +40,23 @@
       </el-form-item>
     </Motion>
 
+    <!--验证码-->
     <Motion :delay="200">
-      <el-form-item prop="password">
+      <el-form-item prop="verifyCode">
         <el-input
-          v-model="ruleForm.password"
+          v-model="ruleForm.verifyCode"
           clearable
-          show-password
-          :placeholder="t('login.purePassword')"
-          :prefix-icon="useRenderIcon(Lock)"
-        />
+          :placeholder="t('login.pureVerifyCode')"
+          :prefix-icon="useRenderIcon(Keyhole)"
+        >
+          <template v-slot:append>
+            <ReImageVerify v-model:code="imgCode" />
+          </template>
+        </el-input>
       </el-form-item>
     </Motion>
 
-    <Motion :delay="250">
-      <el-form-item :rules="repeatPasswordRule" prop="repeatPassword">
-        <el-input
-          v-model="ruleForm.repeatPassword"
-          clearable
-          show-password
-          :placeholder="t('login.pureSure')"
-          :prefix-icon="useRenderIcon(Lock)"
-        />
-      </el-form-item>
-    </Motion>
-
-    <Motion :delay="300">
+    <!-- <Motion :delay="300">
       <el-form-item>
         <el-checkbox v-model="checked">
           {{ t("login.pureReadAccept") }}
@@ -93,7 +65,7 @@
           {{ t("login.purePrivacyPolicy") }}
         </el-button>
       </el-form-item>
-    </Motion>
+    </Motion> -->
 
     <Motion :delay="350">
       <el-form-item>
@@ -135,7 +107,13 @@ import Lock from "~icons/ri/lock-fill";
 import Iphone from "~icons/ep/iphone";
 import User from "~icons/ri/user-3-fill";
 import Keyhole from "~icons/ri/shield-keyhole-line";
+import { ReImageVerify } from "@/components/ReImageVerify";
 
+defineOptions({
+  name: "PhoneRegister"
+});
+
+const imgCode = ref("");
 const { t } = useI18n();
 const checked = ref(false);
 const loading = ref(false);

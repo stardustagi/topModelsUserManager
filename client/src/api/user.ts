@@ -35,9 +35,14 @@ export type RefreshTokenResult = {
 };
 
 /** 登录 */
-export const getLogin = (data?: object) => {
-  return http.request<UserResult>("post", "/login", { data });
-};
+// export const getLogin = (data?: object) => {
+//   return http.request<UserResult>("post", "/login", { data });
+// };
+
+// 账号密码注册
+// export const accountRegisterApi = (data?: object) => {
+//   return http.request<UserResult>("post", "/system/usernameLogin/")
+// }
 
 /** 刷新`token` */
 export const refreshTokenApi = (data?: object) => {

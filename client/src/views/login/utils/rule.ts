@@ -4,7 +4,9 @@ import { $t, transformI18n } from "@/plugins/i18n";
 import { isPhone } from "@pureadmin/utils";
 
 /** 6位数字验证码正则 */
-export const REGEXP_SIX = /^\d{6}$/;
+// export const REGEXP_SIX = /^\d{6}$/;
+// 4位数字字母组合
+export const REGEXP_FOUR = /^[A-Za-z0-9]{4}$/;
 
 /** 密码正则（密码格式应为8-18位数字、字母、符号的任意两种组合） */
 export const REGEXP_PWD =
@@ -49,7 +51,7 @@ const updateRules = reactive<FormRules>({
       validator: (rule, value, callback) => {
         if (value === "") {
           callback(new Error(transformI18n($t("login.pureVerifyCodeReg"))));
-        } else if (!REGEXP_SIX.test(value)) {
+        } else if (!REGEXP_FOUR.test(value)) {
           callback(new Error(transformI18n($t("login.pureVerifyCodeSixReg"))));
         } else {
           callback();

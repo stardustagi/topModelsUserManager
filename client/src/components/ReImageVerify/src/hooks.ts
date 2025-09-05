@@ -1,3 +1,5 @@
+import { getImageCodeApi } from "@/api/managerApi";
+import { useUserStoreHook } from "@/store/modules/user";
 import { ref, onMounted } from "vue";
 
 /**
@@ -13,9 +15,23 @@ export const useImageVerify = (width = 120, height = 40) => {
     imgCode.value = code;
   }
 
-  function getImgCode() {
+  async function getImgCode() {
     if (!domRef.value) return;
-    imgCode.value = draw(domRef.value, width, height);
+
+    const code = await getImageCodeFromServer();
+
+    imgCode.value = draw(domRef.value, width, height, code);
+  }
+
+  async function getImageCodeFromServer() {
+    const tempTime = String(Math.floor(Date.now() / 1000));
+    console.log("tiemttap ==== ", tempTime);
+    useUserStoreHook().SET_IMAGECODETIME(tempTime);
+    const res = await getImageCodeApi({ t: tempTime })
+    if (res.errcode === 0) {
+      return res.data.code;
+    }
+    return "";
   }
 
   onMounted(() => {
@@ -42,18 +58,20 @@ function randomColor(min: number, max: number) {
   return `rgb(${r},${g},${b})`;
 }
 
-function draw(dom: HTMLCanvasElement, width: number, height: number) {
+function draw(dom: HTMLCanvasElement, width: number, height: number, code: string) {
   let imgCode = "";
 
-  const NUMBER_STRING = "0123456789";
+  // const NUMBER_STRING = "0123456789";
 
   const ctx = dom.getContext("2d");
-  if (!ctx) return imgCode;
+  if (!ctx) return "";
 
   ctx.fillStyle = randomColor(180, 230);
   ctx.fillRect(0, 0, width, height);
-  for (let i = 0; i < 4; i += 1) {
-    const text = NUMBER_STRING[randomNum(0, NUMBER_STRING.length)];
+
+  for (let i = 0; i < code.length && i < 4; i += 1) {
+    // const text = NUMBER_STRING[randomNum(0, NUMBER_STRING.length)];
+    const text = code[i];
     imgCode += text;
     const fontSize = randomNum(18, 41);
     const deg = randomNum(-30, 30);
@@ -81,5 +99,5 @@ function draw(dom: HTMLCanvasElement, width: number, height: number) {
     ctx.fillStyle = randomColor(150, 200);
     ctx.fill();
   }
-  return imgCode;
+  return code;
 }

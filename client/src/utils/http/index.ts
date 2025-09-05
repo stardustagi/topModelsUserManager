@@ -11,8 +11,9 @@ import type {
 } from "./types.d";
 import { stringify } from "qs";
 import NProgress from "../progress";
-import { getToken, formatToken } from "@/utils/auth";
+import { getToken, formatToken, setToken } from "@/utils/auth";
 import { useUserStoreHook } from "@/store/modules/user";
+import { message } from "../message";
 
 // 相关配置请参考：www.axios-js.com/zh-cn/docs/#axios-request-config-1
 const defaultConfig: AxiosRequestConfig = {
@@ -81,7 +82,9 @@ class PureHttp {
               if (data) {
                 const now = new Date().getTime();
                 const expired = parseInt(data.expires) - now <= 0;
-                if (expired) {
+                // TODO 暂时不做过期处理
+                // if (expired) {
+                if (false) {
                   if (!PureHttp.isRefreshing) {
                     PureHttp.isRefreshing = true;
                     // token过期刷新
@@ -99,9 +102,10 @@ class PureHttp {
                   }
                   resolve(PureHttp.retryOriginalRequest(config));
                 } else {
-                  config.headers["Authorization"] = formatToken(
+                  config.headers["jwt"] = formatToken(
                     data.accessToken
                   );
+                  config.headers["id"] = data.userId;
                   resolve(config);
                 }
               } else {
@@ -123,6 +127,20 @@ class PureHttp {
         const $config = response.config;
         // 关闭进度条动画
         NProgress.done();
+
+        // 设置token
+        const jwt = response.headers["jwt"];
+        const userId = response.headers["id"];
+        console.log("response ==== ", response);
+        if (jwt && userId) {
+          setToken(jwt, "", userId);
+        }
+
+        // 错误弹出
+        if (response.data.errcode !== 0) {
+          message(response.data.errmsg, { type: "error"});
+        }
+
         // 优先判断post/get等方法是否传入回调，否则执行初始化设置等回调
         if (typeof $config.beforeResponseCallback === "function") {
           $config.beforeResponseCallback(response);

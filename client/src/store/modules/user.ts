@@ -10,7 +10,7 @@ import {
 import {
   type UserResult,
   type RefreshTokenResult,
-  getLogin,
+  // getLogin,
   refreshTokenApi
 } from "@/api/user";
 import { useMultiTagsStoreHook } from "./multiTags";
@@ -33,8 +33,10 @@ export const useUserStore = defineStore("pure-user", {
     isRemembered: false,
     // 登录页的免登录存储几天，默认7天
     loginDay: 7,
-    // 判断登录页面显示哪个组件（0：登录（默认）、1：手机登录、2：二维码登录、3：注册、4：忘记密码）
+    // 判断登录页面显示哪个组件（0：登录（默认）、1：手机登录、2：邮箱登录、3：注册(未用到)、4：忘记密码 5：账号密码注册
     currentPage: 0,
+    // 图形验证码的时间戳
+    imageCodeTime:"",
   }),
   actions: {
     /** 存储头像 */
@@ -69,19 +71,27 @@ export const useUserStore = defineStore("pure-user", {
     SET_CURRENTPAGE(value: number) {
       this.currentPage = value;
     },
-    /** 登入 */
-    async loginByUsername(data) {
-      return new Promise<UserResult>((resolve, reject) => {
-        getLogin(data)
-          .then(data => {
-            if (data?.success) setToken(data.data);
-            resolve(data);
-          })
-          .catch(error => {
-            reject(error);
-          });
-      });
+    SET_IMAGECODETIME(value: string) {
+      this.imageCodeTime = value;
     },
+
+    setLoginTokenAndId(token: string, userId: string) {
+      setToken(token, "", userId);
+    },
+
+    /** 登入 */
+    // async loginByUsername(data) {
+    //   return new Promise<UserResult>((resolve, reject) => {
+    //     getLogin(data)
+    //       .then(data => {
+    //         if (data?.success) setToken(data.data);
+    //         resolve(data);
+    //       })
+    //       .catch(error => {
+    //         reject(error);
+    //       });
+    //   });
+    // },
     /** 前端登出（不调用接口） */
     logOut() {
       this.username = "";
@@ -98,7 +108,7 @@ export const useUserStore = defineStore("pure-user", {
         refreshTokenApi(data)
           .then(data => {
             if (data) {
-              setToken(data.data);
+              // setToken(data.data);
               resolve(data);
             }
           })

@@ -45,4 +45,5 @@ export type userType = {
   isRemembered?: boolean;
   loginDay?: number;
   currentPage?: number;
+  imageCodeTime?: string;
 };

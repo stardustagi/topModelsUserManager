@@ -36,8 +36,9 @@ import { subBefore, getQueryMap } from "@pureadmin/utils";
     // 清空本地旧信息
     removeToken();
 
+    console.log("单点登录= =====================");
     // 保存新信息到本地
-    setToken(params);
+    // setToken(params);
 
     // 删除不需要显示在 url 的参数
     delete params.roles;

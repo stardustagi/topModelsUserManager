@@ -11,7 +11,7 @@
         @change="dataThemeChange"
       /> -->
       <!-- 国际化 -->
-      <el-dropdown trigger="click">
+      <!-- <el-dropdown trigger="click">
         <globalization
           class="hover:text-primary hover:bg-[transparent]! w-[20px] h-[20px] ml-1.5 cursor-pointer outline-hidden duration-300"
         />
@@ -41,7 +41,7 @@
             </el-dropdown-item>
           </el-dropdown-menu>
         </template>
-      </el-dropdown>
+      </el-dropdown> -->
     </div>
     <div class="login-container">
       <div class="img">
@@ -111,7 +111,7 @@
 
             <Motion :delay="250">
               <el-button
-                class="w-full mt-4!"
+                class="w-full mt-4! mb-4!"
                 size="default"
                 type="primary"
                 :loading="loading"
@@ -128,17 +128,54 @@
                   <el-button
                     class="w-full mt-4!"
                     size="default"
-                    @click="useUserStoreHook().SET_CURRENTPAGE(3)"
+                    @click="useUserStoreHook().SET_CURRENTPAGE(1)"
                   >
-                    {{ t('login.pureRegister') }}
+                    手机登录
+                  </el-button>
+
+                  <el-button
+                    class="w-full mt-4!"
+                    size="default"
+                    @click="useUserStoreHook().SET_CURRENTPAGE(2)"
+                  >
+                    邮箱登录
+                  </el-button>
+
+                  <el-button
+                    class="w-full mt-4!"
+                    size="default"
+                    @click="useUserStoreHook().SET_CURRENTPAGE(5)"
+                  >
+                    账号注册
                   </el-button>
                 </div>
               </el-form-item>
             </Motion>
+
+            <!--<Motion :delay="250">
+              <el-form-item>
+                <div class="w-full h-[20px] flex justify-center items-center">
+                  <el-button
+                    link
+                    type="primary"
+                    @click="useUserStoreHook().SET_CURRENTPAGE(4)"
+                  >
+                    {{ t("login.pureForget") }}
+                  </el-button>
+                </div>
+              </el-form-item>
+            </Motion>-->
+            
           </el-form>
 
-          <!-- 注册 -->
-          <LoginRegist v-if="currentPage === 3" />
+          <!-- 手机号注册/登录 -->
+          <PhoneRegister v-if="currentPage === 1" />
+          <!-- 邮箱注册/登录 -->
+          <MailRegister v-if="currentPage === 2" />
+          <!-- 忘记密码 -->
+          <LoginUpdate v-if="currentPage === 4" />
+          <!-- 账号密码注册 -->
+          <AccountRegister v-if="currentPage === 5" />
         </div>
       </div>
     </div>
@@ -159,14 +196,16 @@ import type { FormInstance } from "element-plus";
 import { $t, transformI18n } from "@/plugins/i18n";
 import { useLayout } from "@/layout/hooks/useLayout";
 import { useUserStoreHook } from "@/store/modules/user";
-import { initRouter, getTopMenu } from "@/router/utils";
+import { addPathMatch, getTopMenu } from "@/router/utils";
 import { bg, avatar, illustration } from "./utils/static";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import { useTranslationLang } from "@/layout/hooks/useTranslationLang";
 import { useDataThemeChange } from "@/layout/hooks/useDataThemeChange";
 import { ReImageVerify } from "@/components/ReImageVerify";
-// import LoginRegist from "@/views/login/components/LoginRegist.vue";
-import LoginRegist from "./components/LoginRegist.vue";
+import PhoneRegister from "@/views/login/components/PhoneRegister.vue";
+import AccountRegister from "@/views/login/components/AccountRegister.vue";
+import MailRegister from "@/views/login/components/MailRegister.vue";
+import LoginUpdate from "@/views/login/components/LoginUpdate.vue";
 
 import dayIcon from "@/assets/svg/day.svg?component";
 import darkIcon from "@/assets/svg/dark.svg?component";
@@ -175,6 +214,8 @@ import Keyhole from "~icons/ri/shield-keyhole-line";
 import Lock from "~icons/ri/lock-fill";
 import Check from "~icons/ep/check";
 import User from "~icons/ri/user-3-fill";
+import { accountLoginApi } from "@/api/managerApi";
+import { usePermissionStoreHook } from "@/store/modules/permission";
 
 defineOptions({
   name: "Login"
@@ -198,8 +239,10 @@ const { title, getDropdownItemStyle, getDropdownItemClass } = useNav();
 const { locale, translationCh, translationEn } = useTranslationLang();
 
 const ruleForm = reactive({
-  username: "admin",
-  password: "admin123",
+  // username: "admin",
+  // password: "admin123",
+  username: "",
+  password: "",
   verifyCode: ""
 });
 
@@ -208,25 +251,20 @@ const onLogin = async (formEl: FormInstance | undefined) => {
   await formEl.validate(valid => {
     if (valid) {
       loading.value = true;
-      useUserStoreHook()
-        .loginByUsername({
-          username: ruleForm.username,
-          password: ruleForm.password
-        })
-        .then(res => {
-          if (res.success) {
-            // 获取后端路由
-            return initRouter().then(() => {
-              disabled.value = true;
-              router
-                .push(getTopMenu(true).path)
-                .then(() => {
-                  message(t("login.pureLoginSuccess"), { type: "success" });
-                })
-                .finally(() => (disabled.value = false));
-            });
-          } else {
-            message(t("login.pureLoginFail"), { type: "error" });
+      // useUserStoreHook()
+      //   .loginByUsername({
+      //     username: ruleForm.username,
+      //     password: ruleForm.password
+    //   })
+        const tempTime = useUserStoreHook()?.imageCodeTime || ""
+        accountLoginApi({ user_name: ruleForm.username, password: ruleForm.password, graph_verify_code: ruleForm.verifyCode, t: tempTime }).then((res) => {
+          if (res.errcode === 0) {
+            usePermissionStoreHook().handleWholeMenus([]);
+            addPathMatch();
+            console.log(getTopMenu(true).path, "          new path");
+            router.push(getTopMenu(true).path);
+             message("登录成功", { type: "success" });
+            loading.value = false;
           }
         })
         .finally(() => (loading.value = false));
