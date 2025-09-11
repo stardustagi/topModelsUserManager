@@ -132,27 +132,27 @@ const LayHeader = defineComponent({
     return h(
       "div",
       {
-        class: { "fixed-header": set.fixedHeader },
-        style: [
-          set.hideTabs && layout.value.includes("horizontal")
-            ? isDark.value
-              ? "box-shadow: 0 1px 4px #0d0d0d"
-              : "box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08)"
-            : ""
-        ]
-      },
-      {
-        default: () => [
-          !pureSetting.hiddenSideBar &&
-          (layout.value.includes("vertical") || layout.value.includes("mix"))
-            ? h(LayNavbar)
-            : null,
-          !pureSetting.hiddenSideBar && layout.value.includes("horizontal")
-            ? h(NavHorizontal)
-            : null,
-          h(LayTag)
-        ]
+        // class: { "fixed-header": set.fixedHeader },
+        // style: [
+        //   set.hideTabs && layout.value.includes("horizontal")
+        //     ? isDark.value
+        //       ? "box-shadow: 0 1px 4px #0d0d0d"
+        //       : "box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08)"
+        //     : ""
+        // ]
       }
+      // {
+      //   default: () => [
+      //     !pureSetting.hiddenSideBar &&
+      //     (layout.value.includes("vertical") || layout.value.includes("mix"))
+      //       ? h(LayNavbar)
+      //       : null,
+      //     !pureSetting.hiddenSideBar && layout.value.includes("horizontal")
+      //       ? h(NavHorizontal)
+      //       : null,
+      //     h(LayTag)
+      //   ]
+      // }
     );
   }
 });
@@ -175,28 +175,34 @@ const LayHeader = defineComponent({
         (layout.includes('vertical') || layout.includes('mix'))
       "
     />
+    <!-- <NavVertical v-show="false" /> -->
+
+    <!--是否显示侧边栏，根据不同类型，加一个全局变量控制-->
     <div
       :class="[
         'main-container',
+        // 'main-hidden'
         pureSetting.hiddenSideBar ? 'main-hidden' : ''
       ]"
     >
-      <div v-if="set.fixedHeader">
-        <LayHeader />
+      <!-- <div v-if="set.fixedHeader"> -->
+      <div>
+        <!-- <LayHeader /> -->
         <!-- 主体内容 -->
-        <LayContent :fixed-header="set.fixedHeader" />
+        <!-- <LayContent :fixed-header="set.fixedHeader" /> -->
+        <LayContent :fixed-header="false" />
       </div>
-      <el-scrollbar v-else>
+      <!-- <el-scrollbar v-else>
         <el-backtop
           :title="t('buttons.pureBackTop')"
           target=".main-container .el-scrollbar__wrap"
         >
           <BackTopIcon />
         </el-backtop>
-        <LayHeader />
-        <!-- 主体内容 -->
-        <LayContent :fixed-header="set.fixedHeader" />
-      </el-scrollbar>
+        <LayHeader /> -->
+      <!-- 主体内容 -->
+      <!-- <LayContent :fixed-header="set.fixedHeader" />
+      </el-scrollbar> -->
     </div>
     <!-- 系统设置 -->
     <LaySetting />

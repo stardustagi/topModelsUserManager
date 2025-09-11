@@ -53,7 +53,7 @@ const modules: Record<string, any> = import.meta.glob(
 
 /** 原始静态路由（未做任何处理） */
 const routes = [];
-
+console.log("modules === ", modules);
 Object.keys(modules).forEach(key => {
   routes.push(modules[key].default);
 });
@@ -137,7 +137,7 @@ router.beforeEach((to: ToRouteType, _from, next) => {
   function toCorrectRoute() {
     whiteList.includes(to.fullPath) ? next(_from.fullPath) : next();
   }
-  
+
   if (Cookies.get(multipleTabsKey) && userInfo) {
     // 无权限跳转403页面
     if (to.meta?.roles && !isOneOfArray(to.meta?.roles, userInfo?.roles)) {
@@ -156,7 +156,6 @@ router.beforeEach((to: ToRouteType, _from, next) => {
         toCorrectRoute();
       }
     } else {
-      console.log("5555555555555")
       // 刷新
       if (
         usePermissionStoreHook().wholeMenus.length === 0 &&
@@ -199,7 +198,10 @@ router.beforeEach((to: ToRouteType, _from, next) => {
         addPathMatch();
         if (!useMultiTagsStoreHook().getMultiTagsCache) {
           const { path } = to;
-          const route = findRouteByPath(path, router.options.routes[0].children);
+          const route = findRouteByPath(
+            path,
+            router.options.routes[0].children
+          );
           getTopMenu(true);
           // query、params模式路由传参数的标签页不在此处处理
           if (route && route.meta?.title) {
@@ -209,14 +211,14 @@ router.beforeEach((to: ToRouteType, _from, next) => {
               useMultiTagsStoreHook().handleTags("push", {
                 path,
                 name,
-                meta,
+                meta
               });
             } else {
               const { path, name, meta } = route;
               useMultiTagsStoreHook().handleTags("push", {
                 path,
                 name,
-                meta,
+                meta
               });
             }
           }

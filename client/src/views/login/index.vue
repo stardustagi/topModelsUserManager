@@ -165,7 +165,6 @@
                 </div>
               </el-form-item>
             </Motion>-->
-            
           </el-form>
 
           <!-- 手机号注册/登录 -->
@@ -216,6 +215,7 @@ import Check from "~icons/ep/check";
 import User from "~icons/ri/user-3-fill";
 import { accountLoginApi } from "@/api/managerApi";
 import { usePermissionStoreHook } from "@/store/modules/permission";
+import { setRoles } from "@/utils/auth";
 
 defineOptions({
   name: "Login"
@@ -255,15 +255,24 @@ const onLogin = async (formEl: FormInstance | undefined) => {
       //   .loginByUsername({
       //     username: ruleForm.username,
       //     password: ruleForm.password
-    //   })
-        const tempTime = useUserStoreHook()?.imageCodeTime || ""
-        accountLoginApi({ user_name: ruleForm.username, password: ruleForm.password, graph_verify_code: ruleForm.verifyCode, t: tempTime }).then((res) => {
+      //   })
+      const tempTime = useUserStoreHook()?.imageCodeTime || "";
+      accountLoginApi({
+        user_name: ruleForm.username,
+        password: ruleForm.password,
+        graph_verify_code: ruleForm.verifyCode,
+        t: tempTime
+      })
+        .then(res => {
+          console.log("res ========= ", res);
+          console.log("admin -==== ", res.data.user_info.is_admin);
           if (res.errcode === 0) {
+            setRoles(res.data.user_info.is_admin);
             usePermissionStoreHook().handleWholeMenus([]);
             addPathMatch();
             console.log(getTopMenu(true).path, "          new path");
             router.push(getTopMenu(true).path);
-             message("登录成功", { type: "success" });
+            message("登录成功", { type: "success" });
             loading.value = false;
           }
         })

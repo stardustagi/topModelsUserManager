@@ -1,8 +1,10 @@
 import { $t } from "@/plugins/i18n";
+const Layout = () => import("@/layout/index.vue");
 
 export default {
-  path: "/cansole",
-  redirect: "/console/dashboard",
+  path: "/console",
+  name: "Console",
+  component: Layout,
   meta: {
     icon: "ri/information-line",
     title: "控制台",
