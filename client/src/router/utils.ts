@@ -150,46 +150,46 @@ function addPathMatch() {
 }
 
 /** 处理动态路由（后端返回的路由） */
-function handleAsyncRoutes(routeList) {
-  if (routeList.length === 0) {
-    usePermissionStoreHook().handleWholeMenus(routeList);
-  } else {
-    formatFlatteningRoutes(addAsyncRoutes(routeList)).map(
-      (v: RouteRecordRaw) => {
-        // 防止重复添加路由
-        if (
-          router.options.routes[0].children.findIndex(
-            value => value.path === v.path
-          ) !== -1
-        ) {
-          return;
-        } else {
-          // 切记将路由push到routes后还需要使用addRoute，这样路由才能正常跳转
-          router.options.routes[0].children.push(v);
-          // 最终路由进行升序
-          ascending(router.options.routes[0].children);
-          if (!router.hasRoute(v?.name)) router.addRoute(v);
-          const flattenRouters: any = router
-            .getRoutes()
-            .find(n => n.path === "/");
-          // 保持router.options.routes[0].children与path为"/"的children一致，防止数据不一致导致异常
-          flattenRouters.children = router.options.routes[0].children;
-          router.addRoute(flattenRouters);
-        }
-      }
-    );
-    usePermissionStoreHook().handleWholeMenus(routeList);
-  }
-  if (!useMultiTagsStoreHook().getMultiTagsCache) {
-    useMultiTagsStoreHook().handleTags("equal", [
-      ...routerArrays,
-      ...usePermissionStoreHook().flatteningRoutes.filter(
-        v => v?.meta?.fixedTag
-      )
-    ]);
-  }
-  addPathMatch();
-}
+// function handleAsyncRoutes(routeList) {
+//   if (routeList.length === 0) {
+//     usePermissionStoreHook().handleWholeMenus(routeList);
+//   } else {
+//     formatFlatteningRoutes(addAsyncRoutes(routeList)).map(
+//       (v: RouteRecordRaw) => {
+//         // 防止重复添加路由
+//         if (
+//           router.options.routes[0].children.findIndex(
+//             value => value.path === v.path
+//           ) !== -1
+//         ) {
+//           return;
+//         } else {
+//           // 切记将路由push到routes后还需要使用addRoute，这样路由才能正常跳转
+//           router.options.routes[0].children.push(v);
+//           // 最终路由进行升序
+//           ascending(router.options.routes[0].children);
+//           if (!router.hasRoute(v?.name)) router.addRoute(v);
+//           const flattenRouters: any = router
+//             .getRoutes()
+//             .find(n => n.path === "/");
+//           // 保持router.options.routes[0].children与path为"/"的children一致，防止数据不一致导致异常
+//           flattenRouters.children = router.options.routes[0].children;
+//           router.addRoute(flattenRouters);
+//         }
+//       }
+//     );
+//     usePermissionStoreHook().handleWholeMenus(routeList);
+//   }
+//   if (!useMultiTagsStoreHook().getMultiTagsCache) {
+//     useMultiTagsStoreHook().handleTags("equal", [
+//       ...routerArrays,
+//       ...usePermissionStoreHook().flatteningRoutes.filter(
+//         v => v?.meta?.fixedTag
+//       )
+//     ]);
+//   }
+//   addPathMatch();
+// }
 
 /** 初始化路由（`new Promise` 写法防止在异步请求中造成无限循环）*/
 function initRouter() {
@@ -246,24 +246,84 @@ function formatFlatteningRoutes(routesList: RouteRecordRaw[]) {
  * @param routesList 处理后的一维路由菜单数组
  * @returns 返回将一维数组重新处理成规定路由的格式
  */
-function formatTwoStageRoutes(routesList: RouteRecordRaw[]) {
-  if (routesList.length === 0) return routesList;
-  const newRoutesList: RouteRecordRaw[] = [];
-  routesList.forEach((v: RouteRecordRaw) => {
-    if (v.path === "/") {
-      newRoutesList.push({
-        component: v.component,
-        name: v.name,
-        path: v.path,
-        redirect: v.redirect,
-        meta: v.meta,
-        children: []
+// function formatTwoStageRoutes(routesList: RouteRecordRaw[]) {
+//   if (routesList.length === 0) return routesList;
+//   const newRoutesList: RouteRecordRaw[] = [];
+//   routesList.forEach((v: RouteRecordRaw) => {
+//     if (v.path === "/") {
+//       newRoutesList.push({
+//         component: v.component,
+//         name: v.name,
+//         path: v.path,
+//         redirect: v.redirect,
+//         meta: v.meta,
+//         children: []
+//       });
+//     } else {
+//       newRoutesList[0]?.children.push({ ...v });
+//     }
+//   });
+//   return newRoutesList;
+// }
+
+/** 二级及以上路由处理，保持父路由不丢失 */
+function formatTwoStageRoutes(routesList: RouteRecordRaw[]): RouteRecordRaw[] {
+  if (!routesList || routesList.length === 0) return [];
+
+  const topLevelRoutes: RouteRecordRaw[] = [];
+
+  routesList.forEach(route => {
+    // 如果是顶级 Layout（有 children 或 path 以 / 开头）
+    if (route.path.startsWith("/")) {
+      topLevelRoutes.push({
+        ...route,
+        children: route.children?.map(child => ({ ...child })) || []
       });
     } else {
-      newRoutesList[0]?.children.push({ ...v });
+      // 如果不是顶级，找父路由挂载
+      const parent = topLevelRoutes.find(r =>
+        route.path.startsWith(r.path.replace(/^\//, ""))
+      );
+      if (parent) {
+        parent.children = parent.children || [];
+        parent.children.push({ ...route });
+      }
     }
   });
-  return newRoutesList;
+
+  return topLevelRoutes;
+}
+
+/** 处理动态路由 */
+function handleAsyncRoutes(routeList: RouteRecordRaw[]) {
+  if (!routeList || routeList.length === 0) {
+    usePermissionStoreHook().handleWholeMenus([]);
+    return;
+  }
+
+  const asyncRoutes = addAsyncRoutes(routeList); // 处理 component、redirect
+
+  const structuredRoutes = formatTwoStageRoutes(asyncRoutes);
+
+  // 添加路由
+  structuredRoutes.forEach(route => {
+    if (!router.hasRoute(route.name)) {
+      router.addRoute(route); // 添加顶级路由
+    }
+  });
+
+  usePermissionStoreHook().handleWholeMenus(structuredRoutes);
+
+  if (!useMultiTagsStoreHook().getMultiTagsCache) {
+    useMultiTagsStoreHook().handleTags("equal", [
+      ...routerArrays,
+      ...usePermissionStoreHook().flatteningRoutes.filter(
+        v => v?.meta?.fixedTag
+      )
+    ]);
+  }
+
+  addPathMatch(); // 添加 404
 }
 
 /** 处理缓存路由（添加、删除、刷新） */
@@ -302,6 +362,34 @@ function handleAliveRoute({ name }: ToRouteType, mode?: string) {
 }
 
 /** 过滤后端传来的动态路由 重新生成规范路由 */
+// function addAsyncRoutes(arrRoutes: Array<RouteRecordRaw>) {
+//   if (!arrRoutes || !arrRoutes.length) return;
+//   const modulesRoutesKeys = Object.keys(modulesRoutes);
+//   arrRoutes.forEach((v: RouteRecordRaw) => {
+//     // 将backstage属性加入meta，标识此路由为后端返回路由
+//     v.meta.backstage = true;
+//     // 父级的redirect属性取值：如果子级存在且父级的redirect属性不存在，默认取第一个子级的path；如果子级存在且父级的redirect属性存在，取存在的redirect属性，会覆盖默认值
+//     if (v?.children && v.children.length && !v.redirect)
+//       v.redirect = v.children[0].path;
+//     // 父级的name属性取值：如果子级存在且父级的name属性不存在，默认取第一个子级的name；如果子级存在且父级的name属性存在，取存在的name属性，会覆盖默认值（注意：测试中发现父级的name不能和子级name重复，如果重复会造成重定向无效（跳转404），所以这里给父级的name起名的时候后面会自动加上`Parent`，避免重复）
+//     if (v?.children && v.children.length && !v.name)
+//       v.name = (v.children[0].name as string) + "Parent";
+//     if (v.meta?.frameSrc) {
+//       v.component = IFrame;
+//     } else {
+//       // 对后端传component组件路径和不传做兼容（如果后端传component组件路径，那么path可以随便写，如果不传，component组件路径会跟path保持一致）
+//       const index = v?.component
+//         ? modulesRoutesKeys.findIndex(ev => ev.includes(v.component as any))
+//         : modulesRoutesKeys.findIndex(ev => ev.includes(v.path));
+//       v.component = modulesRoutes[modulesRoutesKeys[index]];
+//     }
+//     if (v?.children && v.children.length) {
+//       addAsyncRoutes(v.children);
+//     }
+//   });
+//   return arrRoutes;
+// }
+
 function addAsyncRoutes(arrRoutes: Array<RouteRecordRaw>) {
   if (!arrRoutes || !arrRoutes.length) return;
   const modulesRoutesKeys = Object.keys(modulesRoutes);
@@ -309,8 +397,13 @@ function addAsyncRoutes(arrRoutes: Array<RouteRecordRaw>) {
     // 将backstage属性加入meta，标识此路由为后端返回路由
     v.meta.backstage = true;
     // 父级的redirect属性取值：如果子级存在且父级的redirect属性不存在，默认取第一个子级的path；如果子级存在且父级的redirect属性存在，取存在的redirect属性，会覆盖默认值
-    if (v?.children && v.children.length && !v.redirect)
-      v.redirect = v.children[0].path;
+    if (v?.children && v.children.length && !v.redirect) {
+      const firstChildPath = v.children[0].path;
+      v.redirect = firstChildPath.startsWith("/")
+        ? firstChildPath
+        : `${v.path}/${firstChildPath}`; // 拼接父路径
+    }
+
     // 父级的name属性取值：如果子级存在且父级的name属性不存在，默认取第一个子级的name；如果子级存在且父级的name属性存在，取存在的name属性，会覆盖默认值（注意：测试中发现父级的name不能和子级name重复，如果重复会造成重定向无效（跳转404），所以这里给父级的name起名的时候后面会自动加上`Parent`，避免重复）
     if (v?.children && v.children.length && !v.name)
       v.name = (v.children[0].name as string) + "Parent";

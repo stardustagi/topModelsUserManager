@@ -160,6 +160,7 @@ const LayHeader = defineComponent({
 
 <template>
   <div ref="appWrapperRef" :class="['app-wrapper', set.classes]">
+    <!--移动端遮罩-->
     <div
       v-show="
         set.device === 'mobile' &&
