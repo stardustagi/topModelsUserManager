@@ -62,7 +62,6 @@ export const mailLoginApi = (data?: object) => {
   );
 };
 
-// TODO  要接入的
 // 绑定公司信息
 export const bindCompanyInfoApi = (data?: object) => {
   return http.request<BaseResponse<DefaultResp>>(
@@ -76,7 +75,7 @@ export const bindCompanyInfoApi = (data?: object) => {
 export const getCompanyInfoApi = (data?: object) => {
   return http.request<BaseResponse<CompanyInfoResp>>(
     "post",
-    baseUrlApi("/useruserGetCompanyInfo"),
+    baseUrlApi("/user/userGetCompanyInfo"),
     { data }
   );
 };

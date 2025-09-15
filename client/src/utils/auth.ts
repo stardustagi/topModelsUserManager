@@ -79,6 +79,7 @@ export function setToken(
         }
       : {}
   );
+  useUserStoreHook().SET_USERID(userId);
 
   // function setUserKey({ avatar, username, nickname, roles, permissions }) {
   //   useUserStoreHook().SET_AVATAR(avatar);

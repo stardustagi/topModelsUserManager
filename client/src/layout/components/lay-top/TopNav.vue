@@ -13,18 +13,36 @@
       </ul>
     </div>
     <div class="right-content">
-      <button class="icon-button"><i class="bell-icon"></i></button>
-      <button class="icon-button"><i class="dark-mode-icon"></i></button>
-      <button class="icon-button"><i class="language-icon"></i></button>
-      <div class="user-dropdown">
-        <span>yuanmu</span>
-        <i class="dropdown-icon"></i>
-      </div>
+      <el-dropdown trigger="click">
+        <span class="el-dropdown-link navbar-bg-hover">
+          <!-- <img :src="userAvatar" :style="avatarsStyle" /> -->
+          <!-- <p v-if="username" class="dark:text-white">{{ username }}</p> -->
+          <p>xxxxxx</p>
+        </span>
+        <template #dropdown>
+          <el-dropdown-menu class="logout">
+            <el-dropdown-item @click="logout">
+              <IconifyIconOffline
+                :icon="LogoutCircleRLine"
+                style="margin: 5px"
+              />
+              {{ t("buttons.pureLoginOut") }}
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
     </div>
   </div>
 </template>
 
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+const { logout } = useNav();
+
+import { useNav } from "@/layout/hooks/useNav";
+import { useTranslationLang } from "@/layout/hooks/useTranslationLang";
+import LogoutCircleRLine from "~icons/ri/logout-circle-r-line";
+const { t } = useTranslationLang();
+</script>
 
 <style scoped>
 .top-nav {
@@ -78,6 +96,15 @@
 .right-content {
   display: flex;
   align-items: center;
+  justify-content: space-around;
+  height: 48px;
+  padding: 10px;
+  color: #000000d9;
+  cursor: pointer;
+
+  p {
+    font-size: 14px;
+  }
 }
 
 .icon-button {

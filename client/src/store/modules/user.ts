@@ -18,6 +18,7 @@ import { type DataInfo, setToken, removeToken, userKey } from "@/utils/auth";
 
 export const useUserStore = defineStore("pure-user", {
   state: (): userType => ({
+    userId: "",
     // 头像
     avatar: storageLocal().getItem<DataInfo<number>>(userKey)?.avatar ?? "",
     // 用户名
@@ -36,7 +37,7 @@ export const useUserStore = defineStore("pure-user", {
     // 判断登录页面显示哪个组件（0：登录（默认）、1：手机登录、2：邮箱登录、3：注册(未用到)、4：忘记密码 5：账号密码注册
     currentPage: 0,
     // 图形验证码的时间戳
-    imageCodeTime:"",
+    imageCodeTime: ""
   }),
   actions: {
     /** 存储头像 */
@@ -73,6 +74,9 @@ export const useUserStore = defineStore("pure-user", {
     },
     SET_IMAGECODETIME(value: string) {
       this.imageCodeTime = value;
+    },
+    SET_USERID(id: string) {
+      this.userId = id;
     },
 
     setLoginTokenAndId(token: string, userId: string) {
