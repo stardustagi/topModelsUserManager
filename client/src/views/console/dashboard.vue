@@ -1,6 +1,6 @@
 <template>
   <div class="p-4">
-    <h1 class="text-2xl font-bold mb-4">下午好, yuanmu</h1>
+    <h1 class="text-2xl font-bold mb-4">下午好, {{ useStore.username }}</h1>
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
       <el-card class="w-full">
         <div class="flex items-center mb-2">
@@ -91,26 +91,18 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-import { ElCard, ElButton } from 'element-plus';
+<script lang="ts" setup>
+import { defineComponent } from "vue";
+import { ElCard, ElButton } from "element-plus";
+import { useUserStoreHook } from "@/store/modules/user";
+const useStore = useUserStoreHook();
 
-export default defineComponent({
-  components: {
-    ElCard,
-    ElButton,
-  },
-  data() {
-    return {
-      apiInfo: [
-        { name: '国内线路', url: 'https://api.wenwen-ai.com' },
-        { name: '海外线路', url: 'https://key.wenwen-ai.com' },
-        { name: '国内备用', url: 'https://a.wenwen-ai.com' },
-        { name: '新节点', url: 'https://apipro.ai' },
-      ],
-    };
-  },
-});
+const apiInfo = [
+  { name: "国内线路", url: "https://xxx1.com" },
+  { name: "海外线路", url: "https://xxx2.com" },
+  { name: "国内备用", url: "https://xxx3.com" },
+  { name: "新节点", url: "https://xxx4.ai" }
+];
 </script>
 
 <style scoped>

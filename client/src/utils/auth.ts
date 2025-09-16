@@ -136,7 +136,7 @@ export function setToken(
   // }
 }
 
-export function setRoles(isAdmin: number) {
+export function setRoles(isAdmin: number, username: string) {
   let roles = [];
   if (isAdmin !== 0) {
     roles = ["admin"];
@@ -144,6 +144,7 @@ export function setRoles(isAdmin: number) {
     roles = ["common"];
   }
 
+  useUserStoreHook().SET_USERNAME(username);
   storageLocal().setItem(userKey, {
     refreshToken: "",
     expires: 0,
@@ -179,3 +180,9 @@ export const hasPerms = (value: string | Array<string>): boolean => {
     : isIncludeAllChildren(value, permissions);
   return isAuths ? true : false;
 };
+
+export function isLoggedIn() {
+  const token = getToken();
+  console.log("token ==111 ", token);
+  return !!token?.accessToken;
+}

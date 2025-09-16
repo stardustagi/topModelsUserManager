@@ -53,7 +53,6 @@ const modules: Record<string, any> = import.meta.glob(
 
 /** 原始静态路由（未做任何处理） */
 const routes = [];
-console.log("modules === ", modules);
 Object.keys(modules).forEach(key => {
   routes.push(modules[key].default);
 });
@@ -109,7 +108,8 @@ export function resetRouter() {
 }
 
 /** 路由白名单 */
-const whiteList = ["/login"];
+const whiteList = ["/login", "/welcome"];
+// const whiteList = ["/login"];
 
 const { VITE_HIDE_HOME } = import.meta.env;
 
@@ -135,7 +135,17 @@ router.beforeEach((to: ToRouteType, _from, next) => {
   }
   /** 如果已经登录并存在登录信息后不能跳转到路由白名单，而是继续保持在当前页面 */
   function toCorrectRoute() {
-    whiteList.includes(to.fullPath) ? next(_from.fullPath) : next();
+    if (
+      (to.fullPath === "/" && _from.fullPath === "/welcome") ||
+      (to.fullPath === "/welcome" && _from.fullPath === "/")
+    ) {
+      return next();
+    }
+    if (whiteList.includes(to.fullPath)) {
+      return next();
+    }
+    next();
+    // whiteList.includes(to.fullPath) ? next(_from.fullPath) : next();
   }
 
   if (Cookies.get(multipleTabsKey) && userInfo) {

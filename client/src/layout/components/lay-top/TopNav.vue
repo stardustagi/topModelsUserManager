@@ -7,30 +7,37 @@
       <ul class="nav-links">
         <li><router-link to="/">首页</router-link></li>
         <li><router-link to="/console">控制台</router-link></li>
-        <li><router-link to="/">定价</router-link></li>
         <li><router-link to="/">文档</router-link></li>
-        <li><router-link to="/">关于</router-link></li>
+        <!-- <li><router-link to="/">关于</router-link></li> -->
       </ul>
     </div>
+
     <div class="right-content">
-      <el-dropdown trigger="click">
-        <span class="el-dropdown-link navbar-bg-hover">
-          <!-- <img :src="userAvatar" :style="avatarsStyle" /> -->
-          <!-- <p v-if="username" class="dark:text-white">{{ username }}</p> -->
-          <p>xxxxxx</p>
-        </span>
-        <template #dropdown>
-          <el-dropdown-menu class="logout">
-            <el-dropdown-item @click="logout">
-              <IconifyIconOffline
-                :icon="LogoutCircleRLine"
-                style="margin: 5px"
-              />
-              {{ t("buttons.pureLoginOut") }}
-            </el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
+      <div v-if="isLoggedIn">
+        <el-dropdown trigger="click">
+          <span class="el-dropdown-link navbar-bg-hover">
+            <!-- <img :src="userAvatar" :style="avatarsStyle" /> -->
+            <!-- <p v-if="username" class="dark:text-white">{{ username }}</p> -->
+            <p>{{ useStore.username }}</p>
+          </span>
+          <template #dropdown>
+            <el-dropdown-menu class="logout">
+              <el-dropdown-item @click="logout">
+                <IconifyIconOffline
+                  :icon="LogoutCircleRLine"
+                  style="margin: 5px"
+                />
+                {{ t("buttons.pureLoginOut") }}
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </div>
+      <div v-else>
+        <div class="flex items-center space-x-4 ml-4">
+          <el-button plain round @click="onLogin">登录</el-button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -41,7 +48,24 @@ const { logout } = useNav();
 import { useNav } from "@/layout/hooks/useNav";
 import { useTranslationLang } from "@/layout/hooks/useTranslationLang";
 import LogoutCircleRLine from "~icons/ri/logout-circle-r-line";
+// import { isLoggedIn } from "@/utils/auth";
+import { useUserStoreHook } from "@/store/modules/user";
+import { useRouter } from "vue-router";
+import { computed } from "vue";
+import { getToken } from "@/utils/auth";
 const { t } = useTranslationLang();
+const router = useRouter();
+const useStore = useUserStoreHook();
+
+const isLoggedIn = computed(() => {
+  const token = getToken();
+  console.log("token == ", token);
+  return !!token?.accessToken;
+});
+
+const onLogin = () => {
+  router.push("/login");
+};
 </script>
 
 <style scoped>

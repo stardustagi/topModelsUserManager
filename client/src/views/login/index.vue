@@ -265,13 +265,14 @@ const onLogin = async (formEl: FormInstance | undefined) => {
       })
         .then(res => {
           console.log("res ========= ", res);
-          console.log("admin -==== ", res.data.user_info.is_admin);
+          console.log("admin -==== ", res.data.user_info.user_name);
           if (res.errcode === 0) {
-            setRoles(res.data.user_info.is_admin);
+            setRoles(res.data.user_info.is_admin, res.data.user_info.user_name);
             usePermissionStoreHook().handleWholeMenus([]);
             addPathMatch();
             console.log(getTopMenu(true).path, "          new path");
-            router.push(getTopMenu(true).path);
+            // router.push(getTopMenu(true).path);
+            router.push("/welcome");
             message("登录成功", { type: "success" });
             loading.value = false;
           }
