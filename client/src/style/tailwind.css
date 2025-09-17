@@ -2,13 +2,15 @@
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/utilities.css" layer(utilities);
 
-@custom-variant dark (&:is(.dark *));
+/* @custom-variant dark (&:is(.dark *)); */
 
-@theme {
+/* @theme { */
+:root {
   --color-bg_color: var(--el-bg-color);
   --color-primary: var(--el-color-primary);
   --color-text_color_primary: var(--el-text-color-primary);
   --color-text_color_regular: var(--el-text-color-regular);
+  --spacing: 0.25rem; /* 确保正确定义 */
 }
 
 /*

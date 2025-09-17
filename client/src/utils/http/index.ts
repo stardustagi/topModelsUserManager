@@ -11,7 +11,7 @@ import type {
 } from "./types.d";
 import { stringify } from "qs";
 import NProgress from "../progress";
-import { getToken, formatToken, setToken } from "@/utils/auth";
+import { getToken, formatToken, setToken, DataInfo } from "@/utils/auth";
 import { useUserStoreHook } from "@/store/modules/user";
 import { message } from "../message";
 
@@ -102,9 +102,7 @@ class PureHttp {
                   }
                   resolve(PureHttp.retryOriginalRequest(config));
                 } else {
-                  config.headers["jwt"] = formatToken(
-                    data.accessToken
-                  );
+                  config.headers["jwt"] = formatToken(data.accessToken);
                   config.headers["id"] = data.userId;
                   resolve(config);
                 }
@@ -133,12 +131,19 @@ class PureHttp {
         const userId = response.headers["id"];
         console.log("response ==== ", response);
         if (jwt && userId) {
-          setToken(jwt, "", userId);
+          const di: DataInfo<number> = {
+            accessToken: jwt,
+            userId: userId,
+            refreshToken: "",
+            expires: 0
+          };
+          setToken(di);
+          // setToken(jwt, "", userId);
         }
 
         // 错误弹出
         if (response.data.errcode !== 0) {
-          message(response.data.errmsg, { type: "error"});
+          message(response.data.errmsg, { type: "error" });
         }
 
         // 优先判断post/get等方法是否传入回调，否则执行初始化设置等回调

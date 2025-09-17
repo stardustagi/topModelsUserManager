@@ -1,91 +1,109 @@
 <template>
-  <div class="p-4">
-    <!-- 页面标题 -->
-    <el-card class="mb-4 bg-gray-100 flex items-center justify-between">
-      <div class="flex items-center">
-        <!-- <img src="@/assets/icon.png" alt="Icon" class="w-8 h-8 mr-2"> -->
-        <div>
-          <h2 class="text-xl font-bold">在线充值</h2>
-          <span class="text-sm text-gray-500">快速方便的充值方式</span>
+  <div class="recharge-container">
+    <!-- 页面标题区域 -->
+    <div class="header-section">
+      <div class="header-content">
+        <div class="title-group">
+          <h1 class="main-title">在线充值</h1>
+          <p class="subtitle">快速方便的充值方式</p>
+        </div>
+        <div class="user-info">
+          <span class="user-tag"
+            ><i class="el-icon-user"></i> yuanmu (普通用户)</span
+          >
         </div>
       </div>
-      <div>
-        <span class="mr-2"><i class="el-icon-user"></i> yuanmu (普通用户)</span>
-      </div>
-    </el-card>
-
-    <!-- 当前余额和历史消耗 -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-      <el-card class="bg-white p-4">
-        <div class="text-center">
-          <span>当前余额</span>
-          <h2 class="text-2xl font-bold mt-2">$0.50</h2>
-        </div>
-      </el-card>
-      <el-card class="bg-white p-4">
-        <div class="text-center">
-          <span>历史消耗</span>
-          <h2 class="text-2xl font-bold mt-2">$0.00</h2>
-        </div>
-      </el-card>
     </div>
 
-    <!-- 选择充值额度 -->
-    <div class="mb-4">
-      <h3 class="text-lg font-bold mb-2">选择充值额度</h3>
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <el-card
+    <!-- 余额信息卡片 -->
+    <div class="balance-cards">
+      <div class="balance-card blue-card">
+        <div class="card-icon">
+          <i class="el-icon-wallet"></i>
+        </div>
+        <div class="card-content">
+          <span class="card-label">当前余额</span>
+          <h2 class="card-value">$0.50</h2>
+        </div>
+      </div>
+
+      <div class="balance-card green-card">
+        <div class="card-icon">
+          <i class="el-icon-data-analysis"></i>
+        </div>
+        <div class="card-content">
+          <span class="card-label">历史消耗</span>
+          <h2 class="card-value">$0.00</h2>
+        </div>
+      </div>
+    </div>
+
+    <!-- 充值选项区域 -->
+    <div class="recharge-section">
+      <h3 class="section-title">选择充值额度</h3>
+      <div class="recharge-options">
+        <div
           v-for="option in rechargeOptions"
           :key="option.value"
-          class="bg-white p-4 cursor-pointer"
+          class="option-card"
+          :class="{ 'option-selected': selectedOption?.value === option.value }"
           @click="selectOption(option)"
         >
-          <div class="text-center">
-            <span>{{ option.label }}</span>
-            <p class="mt-2">{{ option.description }}</p>
+          <div class="option-main">
+            <span class="option-amount">{{ option.label }}</span>
+            <span class="option-currency">额度</span>
           </div>
-        </el-card>
+          <p class="option-price">{{ option.description }}</p>
+        </div>
       </div>
     </div>
 
-    <!-- 自定义金额输入 -->
-    <div class="mb-4">
-      <h3 class="text-lg font-bold mb-2">或输入自定义金额</h3>
-      <div class="flex justify-between items-center">
-        <span>充值数量</span>
-        <span>实付金额：{{ customAmount }} 元</span>
+    <!-- 自定义金额区域 -->
+    <div class="custom-amount-section">
+      <h3 class="section-title">或输入自定义金额</h3>
+      <div class="amount-input-group">
+        <div class="input-header">
+          <span class="input-label">充值数量</span>
+          <span class="actual-amount">实付金额：{{ customAmount }} 元</span>
+        </div>
+        <el-input
+          v-model="customAmount"
+          type="number"
+          placeholder="请输入充值金额"
+          class="custom-input"
+        >
+          <template #prefix>
+            <span class="input-prefix">¥</span>
+          </template>
+        </el-input>
       </div>
-      <el-input
-        v-model="customAmount"
-        type="number"
-        placeholder="请输入充值金额"
-        class="w-full mt-2"
-      ></el-input>
     </div>
 
-    <div class="mb-4">
-      <!-- <h3 class="text-lg font-bold mb-2"></h3> -->
-      <div class="flex justify-between items-center">
-        <span>用户ID</span>
+    <!-- 用户ID输入区域 -->
+    <div class="user-id-section">
+      <div class="input-header">
+        <span class="input-label">用户ID</span>
       </div>
       <el-input
         v-model="rechargeUserId"
         type="number"
-        placeholder="用户ID"
-        class="w-full mt-2"
-      ></el-input>
+        placeholder="请输入用户ID"
+        class="user-id-input"
+      />
     </div>
 
-    <!-- 确定按钮 -->
-    <div class="text-center">
-      <el-button type="primary" @click="confirmRecharge">确定</el-button>
+    <!-- 操作按钮 -->
+    <div class="action-buttons">
+      <el-button type="primary" class="confirm-btn" @click="confirmRecharge">
+        确认充值
+      </el-button>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { ref } from "vue";
-import { ElCard, ElInput, ElButton } from "element-plus";
+import { ElInput, ElButton } from "element-plus";
 import { adminPaymentApi } from "@/api/managerApi";
 
 const customAmount = ref("60");
@@ -103,7 +121,7 @@ const rechargeOptions = [
   { label: "1000", description: "实付 ¥5000.00", value: 1000, money: 500000 }
 ];
 
-const selectOption = option => {
+const selectOption = (option: any) => {
   selectedOption.value = option;
   customAmount.value = option.value.toString();
 };
@@ -112,18 +130,16 @@ const confirmRecharge = async () => {
   let money = 0;
   if (selectedOption.value) {
     money = selectedOption.value.money;
-    // alert(
-    //   `您选择了充值 ${selectedOption.value.value}，实付金额为 ${selectedOption.value.description}`
-    // );
   } else {
     money = Number(customAmount.value) * 100;
-    // alert(`您选择了自定义充值金额 ${customAmount.value} 元`);
   }
-  let data = {
+
+  const data = {
     user_id: Number(rechargeUserId.value),
     amount: money,
     reason: "充值"
   };
+
   const res = await adminPaymentApi(data);
   if (res.errcode === 0) {
     console.log("充值成功");
@@ -132,5 +148,257 @@ const confirmRecharge = async () => {
 </script>
 
 <style scoped>
-/* 添加一些自定义样式 */
+.recharge-container {
+  padding: 24px;
+  background-color: #f5f7fa;
+  min-height: 100vh;
+}
+
+/* 头部样式 */
+.header-section {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title-group .main-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1f2f3d;
+  margin: 0 0 8px 0;
+}
+
+.title-group .subtitle {
+  font-size: 14px;
+  color: #87909c;
+  margin: 0;
+}
+
+.user-info .user-tag {
+  background: #f0f9eb;
+  color: #67c23a;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+}
+
+/* 余额卡片样式 */
+.balance-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.balance-card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.blue-card {
+  border-left: 4px solid #3498db;
+}
+
+.green-card {
+  border-left: 4px solid #2ecc71;
+}
+
+.card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16px;
+  font-size: 20px;
+}
+
+.blue-card .card-icon {
+  background: #e3f2fd;
+  color: #3498db;
+}
+
+.green-card .card-icon {
+  background: #e8f5e8;
+  color: #2ecc71;
+}
+
+.card-label {
+  font-size: 14px;
+  color: #87909c;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.card-value {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1f2f3d;
+  margin: 0;
+}
+
+/* 充值选项样式 */
+.recharge-section {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2f3d;
+  margin: 0 0 20px 0;
+}
+
+.recharge-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 16px;
+}
+
+.option-card {
+  border: 2px solid #e6e8eb;
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.option-card:hover {
+  border-color: #3498db;
+  transform: translateY(-2px);
+}
+
+.option-selected {
+  border-color: #3498db;
+  background: #f0f9ff;
+}
+
+.option-main {
+  margin-bottom: 8px;
+}
+
+.option-amount {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2f3d;
+}
+
+.option-currency {
+  font-size: 12px;
+  color: #87909c;
+  margin-left: 4px;
+}
+
+.option-price {
+  font-size: 12px;
+  color: #3498db;
+  margin: 0;
+}
+
+/* 自定义金额样式 */
+.custom-amount-section {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.amount-input-group {
+  margin-top: 16px;
+}
+
+.input-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.input-label {
+  font-size: 14px;
+  color: #1f2f3d;
+  font-weight: 500;
+}
+
+.actual-amount {
+  font-size: 14px;
+  color: #3498db;
+  font-weight: 500;
+}
+
+.custom-input :deep(.el-input__inner) {
+  height: 48px;
+  font-size: 16px;
+}
+
+.input-prefix {
+  color: #87909c;
+  font-weight: 500;
+}
+
+/* 用户ID输入样式 */
+.user-id-section {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 32px;
+}
+
+.user-id-input :deep(.el-input__inner) {
+  height: 48px;
+}
+
+/* 按钮样式 */
+.action-buttons {
+  text-align: center;
+}
+
+.confirm-btn {
+  width: 200px;
+  height: 48px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .recharge-container {
+    padding: 16px;
+  }
+
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .balance-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .recharge-options {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .confirm-btn {
+    width: 100%;
+  }
+}
 </style>

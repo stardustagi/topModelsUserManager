@@ -22,13 +22,11 @@ export const useUserStore = defineStore("pure-user", {
     // 头像
     avatar: storageLocal().getItem<DataInfo<number>>(userKey)?.avatar ?? "",
     // 用户名
-    // username: storageLocal().getItem<DataInfo<number>>(userKey)?.username ?? "",
-    username: "",
+    username: storageLocal().getItem<DataInfo<number>>(userKey)?.username ?? "",
     // 昵称
     nickname: storageLocal().getItem<DataInfo<number>>(userKey)?.nickname ?? "",
     // 页面级别权限
-    // roles: storageLocal().getItem<DataInfo<number>>(userKey)?.roles ?? [],
-    roles: [],
+    roles: storageLocal().getItem<DataInfo<number>>(userKey)?.roles ?? [],
     // 按钮级别权限
     permissions:
       storageLocal().getItem<DataInfo<number>>(userKey)?.permissions ?? [],
@@ -80,11 +78,6 @@ export const useUserStore = defineStore("pure-user", {
     SET_USERID(id: string) {
       this.userId = id;
     },
-
-    setLoginTokenAndId(token: string, userId: string) {
-      setToken(token, "", userId);
-    },
-
     /** 登入 */
     // async loginByUsername(data) {
     //   return new Promise<UserResult>((resolve, reject) => {
@@ -101,7 +94,6 @@ export const useUserStore = defineStore("pure-user", {
     /** 前端登出（不调用接口） */
     logOut() {
       this.username = "";
-      console.log("111111111111111111111111111111");
       this.roles = [];
       this.permissions = [];
       removeToken();

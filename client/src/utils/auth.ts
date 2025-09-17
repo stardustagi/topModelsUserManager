@@ -47,14 +47,14 @@ export function getToken(): DataInfo<number> {
  * 将`accessToken`、`expires`、`refreshToken`这三条信息放在key值为authorized-token的cookie里（过期自动销毁）
  * 将`avatar`、`username`、`nickname`、`roles`、`permissions`、`refreshToken`、`expires`这七条信息放在key值为`user-info`的localStorage里（利用`multipleTabsKey`当浏览器完全关闭后自动销毁）
  */
-// export function setToken(data: DataInfo<Date>) {
-export function setToken(
-  accessToken: string,
-  refreshToken: string,
-  userId: string
-) {
+export function setToken(data: DataInfo<number>) {
+  // export function setToken(
+  //   accessToken: string,
+  //   refreshToken: string,
+  //   userId: string
+  // ) {
   let expires = 0;
-  // const { accessToken, refreshToken } = data;
+  const { accessToken, refreshToken, userId } = data;
   const { isRemembered, loginDay } = useUserStoreHook();
   // expires = new Date(data.expires).getTime(); // 如果后端直接设置时间戳，将此处代码改为expires = data.expires，然后把上面的DataInfo<Date>改成DataInfo<number>即可
   const cookieString = JSON.stringify({
@@ -79,24 +79,24 @@ export function setToken(
         }
       : {}
   );
-  useUserStoreHook().SET_USERID(userId);
+  // useUserStoreHook().SET_USERID(userId);
 
-  // function setUserKey({ avatar, username, nickname, roles, permissions }) {
-  //   useUserStoreHook().SET_AVATAR(avatar);
-  //   useUserStoreHook().SET_USERNAME(username);
-  //   useUserStoreHook().SET_NICKNAME(nickname);
-  //   useUserStoreHook().SET_ROLES(roles);
-  //   useUserStoreHook().SET_PERMS(permissions);
-  //   storageLocal().setItem(userKey, {
-  //     refreshToken,
-  //     expires,
-  //     avatar,
-  //     username,
-  //     nickname,
-  //     roles,
-  //     permissions
-  //   });
-  // }
+  function setUserKey({ avatar, username, nickname, roles, permissions }) {
+    useUserStoreHook().SET_AVATAR(avatar);
+    useUserStoreHook().SET_USERNAME(username);
+    useUserStoreHook().SET_NICKNAME(nickname);
+    useUserStoreHook().SET_ROLES(roles);
+    useUserStoreHook().SET_PERMS(permissions);
+    storageLocal().setItem(userKey, {
+      refreshToken,
+      expires,
+      avatar,
+      username,
+      nickname,
+      roles,
+      permissions
+    });
+  }
 
   // setUserKey({
   //   avatar: "",
@@ -106,34 +106,34 @@ export function setToken(
   //   permissions: []
   // });
 
-  // if (data.username && data.roles) {
-  //   const { username, roles } = data;
-  //   setUserKey({
-  //     avatar: data?.avatar ?? "",
-  //     username,
-  //     nickname: data?.nickname ?? "",
-  //     roles,
-  //     permissions: data?.permissions ?? []
-  //   });
-  // } else {
-  //   const avatar =
-  //     storageLocal().getItem<DataInfo<number>>(userKey)?.avatar ?? "";
-  //   const username =
-  //     storageLocal().getItem<DataInfo<number>>(userKey)?.username ?? "";
-  //   const nickname =
-  //     storageLocal().getItem<DataInfo<number>>(userKey)?.nickname ?? "";
-  //   const roles =
-  //     storageLocal().getItem<DataInfo<number>>(userKey)?.roles ?? [];
-  //   const permissions =
-  //     storageLocal().getItem<DataInfo<number>>(userKey)?.permissions ?? [];
-  //   setUserKey({
-  //     avatar,
-  //     username,
-  //     nickname,
-  //     roles,
-  //     permissions
-  //   });
-  // }
+  if (data.username && data.roles) {
+    const { username, roles } = data;
+    setUserKey({
+      avatar: data?.avatar ?? "",
+      username,
+      nickname: data?.nickname ?? "",
+      roles,
+      permissions: data?.permissions ?? []
+    });
+  } else {
+    const avatar =
+      storageLocal().getItem<DataInfo<number>>(userKey)?.avatar ?? "";
+    const username =
+      storageLocal().getItem<DataInfo<number>>(userKey)?.username ?? "";
+    const nickname =
+      storageLocal().getItem<DataInfo<number>>(userKey)?.nickname ?? "";
+    const roles =
+      storageLocal().getItem<DataInfo<number>>(userKey)?.roles ?? [];
+    const permissions =
+      storageLocal().getItem<DataInfo<number>>(userKey)?.permissions ?? [];
+    setUserKey({
+      avatar,
+      username,
+      nickname,
+      roles,
+      permissions
+    });
+  }
 }
 
 export function setRoles(isAdmin: number, username: string) {
@@ -149,7 +149,7 @@ export function setRoles(isAdmin: number, username: string) {
     refreshToken: "",
     expires: 0,
     avatar: "",
-    username: "",
+    username: username,
     nickname: "",
     roles,
     permissions: []

@@ -33,13 +33,13 @@
 
     <!-- Hero 区域 -->
     <div
-      class="hero-bg text-white pt-32 pb-20 md:pt-40 md:pb-28 text-center relative"
+      class="hero-bg text-white pt-20 pb-20 md:pt-20 md:pb-28 text-center relative"
     >
       <div class="container mx-auto px-4 relative z-10">
-        <h1 class="text-4xl md:text-6xl font-bold mb-6 scroll-reveal">
+        <h1 class="text-2xl md:text-5xl font-bold mb-6 scroll-reveal">
           释放 AI 潜能，赋能智能未来
         </h1>
-        <p class="text-lg md:text-2xl mb-10 max-w-3xl mx-auto scroll-reveal">
+        <p class="text-lg md:text-2xl !mb-10 !mt-6 scroll-reveal">
           TopModels AI 提供高性能、易集成的
           API，助力开发者构建智能、可靠的应用。
         </p>
@@ -47,11 +47,10 @@
           <el-button
             type="primary"
             size="large"
-            round
             @click="scrollToSection('try-now')"
             >立即试用</el-button
           >
-          <el-button plain size="large" round class="text-white border-white"
+          <el-button plain size="large" class="text-white border-white"
             >查看文档</el-button
           >
         </div>

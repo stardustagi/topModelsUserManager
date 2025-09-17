@@ -8,7 +8,6 @@
         <li><router-link to="/">首页</router-link></li>
         <li><router-link to="/console">控制台</router-link></li>
         <li><router-link to="/">文档</router-link></li>
-        <!-- <li><router-link to="/">关于</router-link></li> -->
       </ul>
     </div>
 
@@ -59,7 +58,8 @@ const useStore = useUserStoreHook();
 
 const isLoggedIn = computed(() => {
   const token = getToken();
-  console.log("token == ", token);
+  console.log(useStore.username, "   000");
+  console.log("token ==666 ", token?.accessToken);
   return !!token?.accessToken;
 });
 
@@ -79,7 +79,9 @@ const onLogin = () => {
   justify-content: space-between;
   align-items: center;
   padding: 10px 20px;
-  background-color: #f8f9fa;
+  /* background-color: #f8f9fa; */
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
   height: 50px;
 }
@@ -104,6 +106,8 @@ const onLogin = () => {
 .nav-links {
   display: flex;
   list-style: none;
+  font-weight: 700;
+  gap: 10px;
   margin: 0;
   padding: 0;
 }
@@ -115,6 +119,11 @@ const onLogin = () => {
 .nav-links a {
   text-decoration: none;
   color: #333;
+}
+
+.nav-links a:hover {
+  text-decoration: none;
+  color: rgb(29, 29, 233);
 }
 
 .right-content {
