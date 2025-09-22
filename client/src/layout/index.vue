@@ -31,6 +31,8 @@ import LaySetting from "./components/lay-setting/index.vue";
 import NavVertical from "./components/lay-sidebar/NavVertical.vue";
 import NavHorizontal from "./components/lay-sidebar/NavHorizontal.vue";
 import BackTopIcon from "@/assets/svg/back_top.svg?component";
+import { useRoute } from "vue-router";
+import LeftSidebar from "./components/docs/LeftSidebar.vue";
 
 const { t } = useI18n();
 const appWrapperRef = ref();
@@ -40,6 +42,7 @@ const isMobile = deviceDetection();
 const pureSetting = useSettingStoreHook();
 const { $storage } = useGlobal<GlobalPropertiesApi>();
 
+const route = useRoute();
 const set: setType = reactive({
   sidebar: computed(() => {
     return useAppStoreHook().sidebar;
@@ -156,6 +159,14 @@ const LayHeader = defineComponent({
     );
   }
 });
+
+const currentSidebar = computed(() => {
+  if (route.path.startsWith("/docs")) {
+    return LeftSidebar;
+  } else {
+    return NavVertical;
+  }
+});
 </script>
 
 <template>
@@ -170,12 +181,21 @@ const LayHeader = defineComponent({
       class="app-mask"
       @click="useAppStoreHook().toggleSideBar()"
     />
-    <NavVertical
+
+    <component
+      :is="currentSidebar"
       v-show="
         !pureSetting.hiddenSideBar &&
         (layout.includes('vertical') || layout.includes('mix'))
       "
+      class="sidebar-container"
     />
+    <!-- <NavVertical
+      v-show="
+        !pureSetting.hiddenSideBar &&
+        (layout.includes('vertical') || layout.includes('mix'))
+      "
+    /> -->
     <!-- <NavVertical v-show="false" /> -->
 
     <!--是否显示侧边栏，根据不同类型，加一个全局变量控制-->

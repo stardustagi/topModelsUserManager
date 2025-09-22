@@ -75,7 +75,7 @@
                 <el-input
                   v-model="ruleForm.username"
                   clearable
-                  :placeholder="t('login.pureUsername')"
+                  placeholder="邮箱"
                   :prefix-icon="useRenderIcon(User)"
                 />
               </el-form-item>
@@ -128,19 +128,19 @@
                   <el-button
                     class="w-full mt-4!"
                     size="default"
+                    @click="useUserStoreHook().SET_CURRENTPAGE(2)"
+                  >
+                    邮箱注册
+                  </el-button>
+
+                  <!--
+                  <el-button
+                    class="w-full mt-4!"
+                    size="default"
                     @click="useUserStoreHook().SET_CURRENTPAGE(1)"
                   >
                     手机登录
                   </el-button>
-
-                  <el-button
-                    class="w-full mt-4!"
-                    size="default"
-                    @click="useUserStoreHook().SET_CURRENTPAGE(2)"
-                  >
-                    邮箱登录
-                  </el-button>
-
                   <el-button
                     class="w-full mt-4!"
                     size="default"
@@ -148,6 +148,7 @@
                   >
                     账号注册
                   </el-button>
+                  -->
                 </div>
               </el-form-item>
             </Motion>
@@ -168,13 +169,13 @@
           </el-form>
 
           <!-- 手机号注册/登录 -->
-          <PhoneRegister v-if="currentPage === 1" />
+          <!--<PhoneRegister v-if="currentPage === 1" /> -->
           <!-- 邮箱注册/登录 -->
           <MailRegister v-if="currentPage === 2" />
           <!-- 忘记密码 -->
-          <LoginUpdate v-if="currentPage === 4" />
+          <!--<LoginUpdate v-if="currentPage === 4" />-->
           <!-- 账号密码注册 -->
-          <AccountRegister v-if="currentPage === 5" />
+          <!--<AccountRegister v-if="currentPage === 5" />-->
         </div>
       </div>
     </div>
@@ -213,7 +214,7 @@ import Keyhole from "~icons/ri/shield-keyhole-line";
 import Lock from "~icons/ri/lock-fill";
 import Check from "~icons/ep/check";
 import User from "~icons/ri/user-3-fill";
-import { accountLoginApi } from "@/api/managerApi";
+import { accountLoginApi, nodeUserEmailLoginApi } from "@/api/managerApi";
 import { usePermissionStoreHook } from "@/store/modules/permission";
 import { setRoles } from "@/utils/auth";
 
@@ -257,17 +258,28 @@ const onLogin = async (formEl: FormInstance | undefined) => {
       //     password: ruleForm.password
       //   })
       const tempTime = useUserStoreHook()?.imageCodeTime || "";
-      accountLoginApi({
-        user_name: ruleForm.username,
+      nodeUserEmailLoginApi({
+        mail: ruleForm.username,
         password: ruleForm.password,
-        graph_verify_code: ruleForm.verifyCode,
+        graph_code: ruleForm.verifyCode,
         t: tempTime
       })
         .then(res => {
           console.log("res ========= ", res);
           console.log("admin -==== ", res.data.user_info.user_name);
           if (res.errcode === 0) {
-            setRoles(res.data.user_info.is_admin, res.data.user_info.user_name);
+            if (res.data.user_info.user_name) {
+              setRoles(
+                res.data.user_info.is_admin,
+                res.data.user_info.user_name
+              );
+            } else {
+              setRoles(
+                res.data.user_info.is_admin,
+                "用户" + String(res.data.user_info.id)
+              );
+            }
+
             usePermissionStoreHook().handleWholeMenus([]);
             addPathMatch();
             console.log(getTopMenu(true).path, "          new path");
@@ -278,6 +290,28 @@ const onLogin = async (formEl: FormInstance | undefined) => {
           }
         })
         .finally(() => (loading.value = false));
+
+      // accountLoginApi({
+      //   user_name: ruleForm.username,
+      //   password: ruleForm.password,
+      //   graph_verify_code: ruleForm.verifyCode,
+      //   t: tempTime
+      // })
+      //   .then(res => {
+      //     console.log("res ========= ", res);
+      //     console.log("admin -==== ", res.data.user_info.user_name);
+      //     if (res.errcode === 0) {
+      //       setRoles(res.data.user_info.is_admin, res.data.user_info.user_name);
+      //       usePermissionStoreHook().handleWholeMenus([]);
+      //       addPathMatch();
+      //       console.log(getTopMenu(true).path, "          new path");
+      //       // router.push(getTopMenu(true).path);
+      //       router.push("/welcome");
+      //       message("登录成功", { type: "success" });
+      //       loading.value = false;
+      //     }
+      //   })
+      //   .finally(() => (loading.value = false));
     }
   });
 };

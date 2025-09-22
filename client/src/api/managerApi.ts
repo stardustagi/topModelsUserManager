@@ -115,3 +115,30 @@ export const changePasswordApi = (data?: object) => {
     { data }
   );
 };
+
+// 节点用户邮箱注册
+export const nodeUserEmailRegisterApi = (data?: object) => {
+  return http.request<BaseResponse<DefaultResp>>(
+    "post",
+    baseUrlApi("/system/nodeUserRegister"),
+    { data }
+  );
+};
+
+// 后台邮件登录
+export const nodeUserEmailLoginApi = (data?: object) => {
+  return http.request<BaseResponse<LoginResp>>(
+    "post",
+    baseUrlApi("/system/nodeUserEmailLogin"),
+    { data }
+  );
+};
+
+// 申请AKSK
+export const nodeUserAddAccessKeyAndSecurityKeyApi = (data?: object) => {
+  return http.request<BaseResponse<LoginResp>>(
+    "post",
+    baseUrlApi("/llmUser/nodeUserAddAccessKeyAndSecurityKey"),
+    { data }
+  );
+};

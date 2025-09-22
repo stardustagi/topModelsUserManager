@@ -26,7 +26,17 @@ export default {
       component: () => import("@/views/console/person_center/wallet/index.vue"),
       meta: {
         title: "钱包",
-        roles: ["admin"]
+        roles: ["admin"],
+        showLink: false
+      }
+    },
+    {
+      path: "person_center/keymanager",
+      name: "KeyMgr",
+      component: () =>
+        import("@/views/console/person_center/keymanager/index.vue"),
+      meta: {
+        title: "令牌管理"
       }
     },
     {

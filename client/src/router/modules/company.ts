@@ -8,7 +8,7 @@ export default {
     // showLink: false,
     // title: $t("menus.pureAbnormal"),
     title: "企业",
-    rank: 11,
+    rank: 11
   },
   children: [
     {
@@ -17,8 +17,8 @@ export default {
       component: () => import("@/views/company/models/index.vue"),
       meta: {
         title: "上传模型",
-        roles: ["editor"],
+        roles: ["editor"]
       }
-    },
+    }
   ]
 } satisfies RouteConfigsTable;
