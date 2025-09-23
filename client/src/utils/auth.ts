@@ -79,14 +79,23 @@ export function setToken(data: DataInfo<number>) {
         }
       : {}
   );
+
   // useUserStoreHook().SET_USERID(userId);
 
-  function setUserKey({ avatar, username, nickname, roles, permissions }) {
+  function setUserKey({
+    avatar,
+    username,
+    nickname,
+    roles,
+    permissions,
+    userId
+  }) {
     useUserStoreHook().SET_AVATAR(avatar);
     useUserStoreHook().SET_USERNAME(username);
     useUserStoreHook().SET_NICKNAME(nickname);
     useUserStoreHook().SET_ROLES(roles);
     useUserStoreHook().SET_PERMS(permissions);
+    useUserStoreHook().SET_USERID(userId);
     storageLocal().setItem(userKey, {
       refreshToken,
       expires,
@@ -94,46 +103,43 @@ export function setToken(data: DataInfo<number>) {
       username,
       nickname,
       roles,
-      permissions
+      permissions,
+      userId
     });
   }
 
-  // setUserKey({
-  //   avatar: "",
-  //   username: "",
-  //   nickname: "",
-  //   roles: [],
-  //   permissions: []
-  // });
-
-  if (data.username && data.roles) {
-    const { username, roles } = data;
-    setUserKey({
-      avatar: data?.avatar ?? "",
-      username,
-      nickname: data?.nickname ?? "",
-      roles,
-      permissions: data?.permissions ?? []
-    });
-  } else {
-    const avatar =
-      storageLocal().getItem<DataInfo<number>>(userKey)?.avatar ?? "";
-    const username =
-      storageLocal().getItem<DataInfo<number>>(userKey)?.username ?? "";
-    const nickname =
-      storageLocal().getItem<DataInfo<number>>(userKey)?.nickname ?? "";
-    const roles =
-      storageLocal().getItem<DataInfo<number>>(userKey)?.roles ?? [];
-    const permissions =
-      storageLocal().getItem<DataInfo<number>>(userKey)?.permissions ?? [];
-    setUserKey({
-      avatar,
-      username,
-      nickname,
-      roles,
-      permissions
-    });
-  }
+  // if (data.username && data.roles) {
+  const { username, roles } = data;
+  setUserKey({
+    avatar: data?.avatar ?? "",
+    username,
+    nickname: "111111111111111111666",
+    roles,
+    permissions: data?.permissions ?? [],
+    userId: userId
+  });
+  // } else {
+  //   const avatar =
+  //     storageLocal().getItem<DataInfo<number>>(userKey)?.avatar ?? "";
+  //   const username =
+  //     storageLocal().getItem<DataInfo<number>>(userKey)?.username ?? "";
+  //   const nickname =
+  //     storageLocal().getItem<DataInfo<number>>(userKey)?.nickname ?? "";
+  //   const roles =
+  //     storageLocal().getItem<DataInfo<number>>(userKey)?.roles ?? [];
+  //   const permissions =
+  //     storageLocal().getItem<DataInfo<number>>(userKey)?.permissions ?? [];
+  //   const userId =
+  //     storageLocal().getItem<DataInfo<number>>(userKey)?.userId ?? userId;
+  //   setUserKey({
+  //     avatar,
+  //     username,
+  //     nickname,
+  //     roles,
+  //     permissions,
+  //     userId
+  //   });
+  // }
 }
 
 export function setRoles(isAdmin: number, username: string) {
@@ -144,20 +150,27 @@ export function setRoles(isAdmin: number, username: string) {
     roles = ["common"];
   }
 
+  const userId =
+    storageLocal().getItem<DataInfo<number>>(userKey)?.userId ?? "";
   useUserStoreHook().SET_USERNAME(username);
   storageLocal().setItem(userKey, {
     refreshToken: "",
     expires: 0,
     avatar: "",
     username: username,
-    nickname: "",
+    nickname: "111111111111111111666",
     roles,
-    permissions: []
+    permissions: [],
+    userId: userId
   });
 }
 
 /** 删除`token`以及key值为`user-info`的localStorage信息 */
 export function removeToken() {
+  console.log(
+    "remove tokne =====================================111111111111111111111111111"
+  );
+
   Cookies.remove(TokenKey);
   Cookies.remove(multipleTabsKey);
   storageLocal().removeItem(userKey);
@@ -165,7 +178,8 @@ export function removeToken() {
 
 /** 格式化token（jwt格式） */
 export const formatToken = (token: string): string => {
-  return "Bearer " + token;
+  // return "Bearer " + token;
+  return token;
 };
 
 /** 是否有按钮级别的权限（根据登录接口返回的`permissions`字段进行判断）*/

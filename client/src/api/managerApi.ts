@@ -4,7 +4,8 @@ import {
   CompanyInfoResp,
   DefaultResp,
   ImageCodeResp,
-  LoginResp
+  LoginResp,
+  UserAkSkResp
 } from "./apiParamsResp";
 import { baseUrlApi } from "./utils";
 
@@ -139,6 +140,25 @@ export const nodeUserAddAccessKeyAndSecurityKeyApi = (data?: object) => {
   return http.request<BaseResponse<LoginResp>>(
     "post",
     baseUrlApi("/llmUser/nodeUserAddAccessKeyAndSecurityKey"),
+    { data }
+  );
+};
+
+// 获取aksk
+export const nodeUserGetAkSkApi = (data?: object) => {
+  return http.request<BaseResponse<UserAkSkResp>>(
+    "post",
+    baseUrlApi("/user/nodeUserGetAkSk"),
+    { data }
+  );
+};
+
+// 删除aksk
+export const nodeUserDelAkSkApi = (data?: object) => {
+  console.log("data === ", data);
+  return http.request<BaseResponse<DefaultResp>>(
+    "post",
+    baseUrlApi("/user/nodeUserDelAkSk"),
     { data }
   );
 };

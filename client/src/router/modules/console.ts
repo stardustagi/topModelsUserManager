@@ -5,7 +5,7 @@ export default {
   path: "/console",
   name: "Console",
   component: Layout,
-  redirect: "/console/dashboard",
+  redirect: "/console/person_center/keymanager",
   meta: {
     icon: "ri/information-line",
     title: "控制台",
@@ -17,7 +17,8 @@ export default {
       name: "Dashboard",
       component: () => import("@/views/console/dashboard.vue"),
       meta: {
-        title: "数据看板"
+        title: "数据看板",
+        showLink: false
       }
     },
     {

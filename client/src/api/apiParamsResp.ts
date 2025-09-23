@@ -42,3 +42,15 @@ export type CompanyInfoResp = {
   mail: string;
   is_realname_authentication: number;
 };
+
+// aksk信息
+export type UserAkSkDTO = {
+  node_id: string;
+  access_key: string;
+  secret_key: string;
+  lastupdate_at: number;
+};
+
+export type UserAkSkResp = {
+  keys: UserAkSkDTO[];
+};

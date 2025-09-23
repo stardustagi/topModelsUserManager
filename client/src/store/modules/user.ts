@@ -14,11 +14,11 @@ import {
   refreshTokenApi
 } from "@/api/user";
 import { useMultiTagsStoreHook } from "./multiTags";
-import { type DataInfo, setToken, removeToken, userKey } from "@/utils/auth";
+import { type DataInfo, removeToken, userKey } from "@/utils/auth";
 
 export const useUserStore = defineStore("pure-user", {
   state: (): userType => ({
-    userId: "",
+    userId: storageLocal().getItem<DataInfo<number>>(userKey)?.userId ?? "0",
     // 头像
     avatar: storageLocal().getItem<DataInfo<number>>(userKey)?.avatar ?? "",
     // 用户名
@@ -96,6 +96,7 @@ export const useUserStore = defineStore("pure-user", {
       this.username = "";
       this.roles = [];
       this.permissions = [];
+      this.userId = "";
       removeToken();
       useMultiTagsStoreHook().handleTags("equal", [...routerArrays]);
       resetRouter();
