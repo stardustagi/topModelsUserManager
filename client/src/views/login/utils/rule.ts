@@ -14,20 +14,20 @@ export const REGEXP_PWD =
 
 /** 登录校验 */
 const loginRules = reactive<FormRules>({
-  password: [
-    {
-      validator: (rule, value, callback) => {
-        if (value === "") {
-          callback(new Error(transformI18n($t("login.purePassWordReg"))));
-        } else if (!REGEXP_PWD.test(value)) {
-          callback(new Error(transformI18n($t("login.purePassWordRuleReg"))));
-        } else {
-          callback();
-        }
-      },
-      trigger: "blur"
-    }
-  ]
+  // password: [
+  //   {
+  //     validator: (rule, value, callback) => {
+  //       if (value === "") {
+  //         callback(new Error(transformI18n($t("login.purePassWordReg"))));
+  //       } else if (!REGEXP_PWD.test(value)) {
+  //         callback(new Error(transformI18n($t("login.purePassWordRuleReg"))));
+  //       } else {
+  //         callback();
+  //       }
+  //     },
+  //     trigger: "blur"
+  //   }
+  // ]
 });
 
 /** 忘记密码校验 */
@@ -76,4 +76,4 @@ const updateRules = reactive<FormRules>({
   ]
 });
 
-export { loginRules,updateRules };
+export { loginRules, updateRules };

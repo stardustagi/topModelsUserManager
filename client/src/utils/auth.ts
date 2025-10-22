@@ -23,15 +23,15 @@ export interface DataInfo<T> {
   userId: string;
 }
 
-export const userKey = "user-info";
-export const TokenKey = "authorized-token";
+export const userKey = "jduser-info";
+export const TokenKey = "jduser-authorized-token";
 /**
  * 通过`multiple-tabs`是否在`cookie`中，判断用户是否已经登录系统，
  * 从而支持多标签页打开已经登录的系统后无需再登录。
  * 浏览器完全关闭后`multiple-tabs`将自动从`cookie`中销毁，
  * 再次打开浏览器需要重新登录系统
  * */
-export const multipleTabsKey = "multiple-tabs";
+export const multipleTabsKey = "jduser-multiple-tabs";
 
 /** 获取`token` */
 export function getToken(): DataInfo<number> {
@@ -113,7 +113,7 @@ export function setToken(data: DataInfo<number>) {
   setUserKey({
     avatar: data?.avatar ?? "",
     username,
-    nickname: "111111111111111111666",
+    nickname: "",
     roles,
     permissions: data?.permissions ?? [],
     userId: userId
@@ -158,7 +158,7 @@ export function setRoles(isAdmin: number, username: string) {
     expires: 0,
     avatar: "",
     username: username,
-    nickname: "111111111111111111666",
+    nickname: "",
     roles,
     permissions: [],
     userId: userId

@@ -4,13 +4,49 @@ import { setupStore } from "@/store";
 import { useI18n } from "@/plugins/i18n";
 import { getPlatformConfig } from "./config";
 import { MotionPlugin } from "@vueuse/motion";
-// import { useEcharts } from "@/plugins/echarts";
 import { createApp, type Directive } from "vue";
 import { useElementPlus } from "@/plugins/elementPlus";
 import { injectResponsiveStorage } from "@/utils/responsive";
-
 import Table from "@pureadmin/table";
-// import PureDescriptions from "@pureadmin/descriptions";
+
+// ==================== ECharts引入 ====================
+import { use } from "echarts/core";
+import { CanvasRenderer, SVGRenderer } from "echarts/renderers"; // 渲染器，必须有
+import { LineChart, PieChart, BarChart } from "echarts/charts"; // 需要折线图
+import {
+  GridComponent,
+  TitleComponent,
+  PolarComponent,
+  LegendComponent,
+  GraphicComponent,
+  ToolboxComponent,
+  TooltipComponent,
+  DataZoomComponent,
+  VisualMapComponent
+} from "echarts/components";
+import ECharts from "vue-echarts"; // 默认导入，注册为组件
+
+// 注册 echarts 模块
+use([
+  // ✅ 图表类型
+  PieChart,
+  BarChart,
+  LineChart,
+  // ✅ 渲染器（必须至少一个）
+  CanvasRenderer,
+  // ✅ 可选：同时支持 SVG 渲染
+  SVGRenderer,
+  // ✅ 各类组件
+  GridComponent,
+  TitleComponent,
+  PolarComponent,
+  LegendComponent,
+  GraphicComponent,
+  ToolboxComponent,
+  TooltipComponent,
+  DataZoomComponent,
+  VisualMapComponent
+]);
 
 // 引入重置样式
 import "./style/reset.scss";
@@ -36,7 +72,8 @@ import {
   IconifyIconOffline,
   IconifyIconOnline,
   FontIcon
-} from "./components/ReIcon";
+} from "./components/ReIcon"; // 默认导入，注册为组件
+
 app.component("IconifyIconOffline", IconifyIconOffline);
 app.component("IconifyIconOnline", IconifyIconOnline);
 app.component("FontIcon", FontIcon);
@@ -46,6 +83,7 @@ import { Auth } from "@/components/ReAuth";
 import { Perms } from "@/components/RePerms";
 app.component("Auth", Auth);
 app.component("Perms", Perms);
+app.component("v-chart", ECharts);
 
 // 全局注册vue-tippy
 import "tippy.js/dist/tippy.css";
@@ -60,6 +98,5 @@ getPlatformConfig(app).then(async config => {
   injectResponsiveStorage(app, config);
   app.use(MotionPlugin).use(useI18n).use(useElementPlus).use(Table);
   // .use(PureDescriptions)
-  // .use(useEcharts);
   app.mount("#app");
 });

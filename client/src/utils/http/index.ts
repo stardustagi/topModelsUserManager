@@ -14,6 +14,9 @@ import NProgress from "../progress";
 import { getToken, formatToken, setToken, DataInfo } from "@/utils/auth";
 import { useUserStoreHook } from "@/store/modules/user";
 import { message } from "../message";
+import { resolve } from "node:path";
+
+let isRedirecting = false;
 
 // 相关配置请参考：www.axios-js.com/zh-cn/docs/#axios-request-config-1
 const defaultConfig: AxiosRequestConfig = {
@@ -76,7 +79,12 @@ class PureHttp {
         /** 请求白名单，放置一些不需要`token`的接口（通过设置请求白名单，防止`token`过期后再请求造成的死循环问题） */
         const whiteList = ["/refresh-token", "/login"];
         return whiteList.some(url => config.url.endsWith(url))
-          ? config
+          ? new Promise(resolve => {
+              console.log("1111111111111");
+              config.headers["jwt"] = "11";
+              config.headers["id"] = 0;
+              resolve(config);
+            })
           : new Promise(resolve => {
               const data = getToken();
               if (data) {
@@ -102,11 +110,15 @@ class PureHttp {
                   }
                   resolve(PureHttp.retryOriginalRequest(config));
                 } else {
+                  console.log("222222222222222222222222222222");
                   config.headers["jwt"] = formatToken(data.accessToken);
                   config.headers["id"] = data.userId;
                   resolve(config);
                 }
               } else {
+                console.log("3333333333333333333333");
+                config.headers["jwt"] = "";
+                config.headers["id"] = 0;
                 resolve(config);
               }
             });
@@ -162,6 +174,15 @@ class PureHttp {
         $error.isCancelRequest = Axios.isCancel($error);
         // 关闭进度条动画
         NProgress.done();
+
+        if (error.response?.status === 401 && !isRedirecting) {
+          isRedirecting = true;
+
+          useUserStoreHook().logOut();
+
+          message("登录已过期，请重新登录", { type: "error" });
+        }
+
         // 所有的响应异常 区分来源为取消请求/非取消请求
         return Promise.reject($error);
       }

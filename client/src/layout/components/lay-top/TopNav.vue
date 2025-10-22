@@ -7,8 +7,8 @@
       <ul class="nav-links">
         <li><router-link to="/">首页</router-link></li>
         <li><router-link to="/console">控制台</router-link></li>
-        <li><router-link to="/docs">文档</router-link></li>
-        <li><router-link to="/">下载</router-link></li>
+        <!-- <li><router-link to="/docs">文档</router-link></li> -->
+        <!-- <li><router-link to="/">下载</router-link></li> -->
       </ul>
     </div>
 

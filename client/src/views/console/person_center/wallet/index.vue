@@ -104,7 +104,7 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 import { ElInput, ElButton } from "element-plus";
-import { adminPaymentApi } from "@/api/managerApi";
+// import { adminPaymentApi } from "@/api/managerApi";
 
 const customAmount = ref("60");
 const rechargeUserId = ref("");
@@ -127,23 +127,23 @@ const selectOption = (option: any) => {
 };
 
 const confirmRecharge = async () => {
-  let money = 0;
-  if (selectedOption.value) {
-    money = selectedOption.value.money;
-  } else {
-    money = Number(customAmount.value) * 100;
-  }
+  // let money = 0;
+  // if (selectedOption.value) {
+  //   money = selectedOption.value.money;
+  // } else {
+  //   money = Number(customAmount.value) * 100;
+  // }
 
-  const data = {
-    user_id: Number(rechargeUserId.value),
-    amount: money,
-    reason: "充值"
-  };
+  // const data = {
+  //   user_id: Number(rechargeUserId.value),
+  //   amount: money,
+  //   reason: "充值"
+  // };
 
-  const res = await adminPaymentApi(data);
-  if (res.errcode === 0) {
-    console.log("充值成功");
-  }
+  // const res = await adminPaymentApi(data);
+  // if (res.errcode === 0) {
+  //   console.log("充值成功");
+  // }
 };
 </script>
 

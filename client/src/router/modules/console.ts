@@ -41,11 +41,19 @@ export default {
       }
     },
     {
-      path: "person_center/set",
-      name: "Set",
-      component: () => import("@/views/console/person_center/set/index.vue"),
+      path: "person_center/modelmarket",
+      name: "ModelMarket",
+      component: () => import("@/views/console/person_center/modelmarket.vue"),
       meta: {
-        title: "个人设置"
+        title: "模型市场"
+      }
+    },
+    {
+      path: "person_center/mymodel",
+      name: "MyModel",
+      component: () => import("@/views/console/person_center/mymodel.vue"),
+      meta: {
+        title: "我的模型"
       }
     }
   ]
