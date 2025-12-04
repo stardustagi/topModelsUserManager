@@ -11,7 +11,7 @@ import {
   UserAkSkResp,
   UserSelectModelResp
 } from "./apiParamsResp";
-import { baseUrlApi, statsUrlApi } from "./utils";
+import { baseUrlApi } from "./utils";
 import { object } from "vue-types";
 
 /** 图形验证码 */
@@ -150,7 +150,7 @@ export const setModelKeysApi = (data?: object) => {
 export const apikeyLoginApi = (data?: object) => {
   return http.request<BaseResponse<LoginResp>>(
     "post",
-    baseUrlApi("/system/apiKeyLogin"),
+    baseUrlApi("/system/loginFormUserApiKey"),
     { data }
   );
 };
@@ -161,7 +161,7 @@ export const apikeyLoginApi = (data?: object) => {
 export const realtimeApi = (data?: object) => {
   return http.request<BaseResponse<DefaultResp>>(
     "get",
-    statsUrlApi("/v1/usage/realtime"),
+    baseUrlApi("/v1/usage/realtime", "stats"),
     { data }
   );
 };
@@ -170,7 +170,7 @@ export const realtimeApi = (data?: object) => {
 export const trendsApi = (data?: object) => {
   return http.request<BaseResponse<DefaultResp>>(
     "get",
-    statsUrlApi("/v1/usage/trends"),
+    baseUrlApi("/v1/usage/trends", "stats"),
     { data }
   );
 };
@@ -179,7 +179,7 @@ export const trendsApi = (data?: object) => {
 export const modelProportionApi = (data?: object) => {
   return http.request<BaseResponse<DefaultResp>>(
     "get",
-    statsUrlApi("/v1/usage/model-proportion"),
+    baseUrlApi("/v1/usage/model-proportion", "stats"),
     { data }
   );
 };
@@ -188,7 +188,7 @@ export const modelProportionApi = (data?: object) => {
 export const budgetAlertApi = (data?: object) => {
   return http.request<BaseResponse<DefaultResp>>(
     "get",
-    statsUrlApi("/v1/usage/budget-alert"),
+    baseUrlApi("/v1/usage/budget-alert", "stats"),
     { data }
   );
 };
@@ -197,7 +197,7 @@ export const budgetAlertApi = (data?: object) => {
 export const detailExportApi = (data?: object) => {
   return http.request<BaseResponse<DefaultResp>>(
     "get",
-    statsUrlApi("/v1/usage/detail-export"),
+    baseUrlApi("/v1/usage/detail-export", "stats"),
     { data }
   );
 };
@@ -206,7 +206,7 @@ export const detailExportApi = (data?: object) => {
 export const apiKeyAggregateApi = (data?: object) => {
   return http.request<BaseResponse<DefaultResp>>(
     "get",
-    statsUrlApi("/v1/usage/api-key-aggregate"),
+    baseUrlApi("/v1/usage/api-key-aggregate", "stats"),
     { data }
   );
 };

@@ -1,5 +1,5 @@
 export interface modelMarketEntity {
-  id: string;
+  id: number;
   name: string;
   // provider: ProviderDTO[];
   provider: string;

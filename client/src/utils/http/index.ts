@@ -181,6 +181,9 @@ class PureHttp {
           useUserStoreHook().logOut();
 
           message("登录已过期，请重新登录", { type: "error" });
+          setTimeout(() => {
+            isRedirecting = false;
+          }, 3000); // 3秒后重置，可根据需要调整
         }
 
         // 所有的响应异常 区分来源为取消请求/非取消请求

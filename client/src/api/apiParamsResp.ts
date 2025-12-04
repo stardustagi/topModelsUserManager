@@ -110,18 +110,18 @@ export interface UnSubscribeModelResp {}
 
 // 我的模型列表
 export interface UserSelectModelDTO {
-  id: string;
+  map_id: number;
   model_id: string;
   node_id: string;
-  name: string;
+  model_name: string;
   api_version: string;
   deploy_name: string;
-  input_price: number;
-  output_price: number;
-  cache_price: number;
+  model_input_price: number;
+  model_output_price: number;
+  model_cache_price: number;
   status: string;
   last_update: number;
-  address: string;
+  domain: string;
 }
 export interface UserSelectModelResp {
   errcode: number;
@@ -131,7 +131,7 @@ export interface UserSelectModelResp {
 
 // 模型实体
 export interface ModelEntity {
-  id: string;
+  id: number;
   name: string;
   provider: string;
   address: string;

@@ -3,14 +3,11 @@
     <div class="market-header">
       <h2 class="market-title">模型市场</h2>
       <div class="search-filter">
-        <el-input
-          v-model="searchQuery"
-          placeholder="搜索模型名称..."
-          class="search-input"
-          size="large"
-        >
+        <el-input v-model="searchQuery" placeholder="搜索模型名称..." class="search-input" size="large">
           <template #prefix>
-            <el-icon><Search /></el-icon>
+            <!-- <el-icon>
+              <Search />
+            </el-icon> -->
           </template>
         </el-input>
         <el-select v-model="sortOrder" placeholder="排序方式" size="large" class="sort-select">
@@ -20,8 +17,8 @@
           <el-option label="评分从高到低" value="rating-desc" />
         </el-select>
 
-         <!-- 新增模型类型切换 -->
-          <!-- <el-radio-group v-model="modelType" size="large">
+        <!-- 新增模型类型切换 -->
+        <!-- <el-radio-group v-model="modelType" size="large">
             <el-radio-button label="0" @click="handleModelTypeChange(0)">公有模型</el-radio-button>
             <el-radio-button label="1" @click="handleModelTypeChange(1)">私有模型</el-radio-button>
           </el-radio-group> -->
@@ -45,9 +42,7 @@
             </div>
             <div class="stat-item">
               <span class="stat-label">输出价格:</span>
-              <span class="stat-value"
-                >¥{{ r.output_price / 100 }}/百万token</span
-              >
+              <span class="stat-value">¥{{ r.output_price / 100 }}/百万token</span>
             </div>
             <div class="stat-item">
               <span class="stat-label">缓存价格:</span>
@@ -67,25 +62,12 @@
 
           <div class="card-footer">
             <div class="model-meta">
-              <span class="update-time"
-                >更新于: {{ formatTime(r.last_updated) }}</span
-              >
+              <span class="update-time">更新于: {{ formatTime(r.last_updated) }}</span>
             </div>
-            <el-button
-              v-if="r.subscribed"
-              class="subscribe-btn"
-              type="primary"
-              size="large"
-            >
+            <el-button v-if="r.subscribed" class="subscribe-btn" type="primary" size="large">
               已订阅
             </el-button>
-            <el-button
-              v-else
-              class="subscribe-btn"
-              type="primary"
-              size="large"
-              @click="onClickSubscribe(r)"
-            >
+            <el-button v-else class="subscribe-btn" type="primary" size="large" @click="onClickSubscribe(r)">
               订阅模型
             </el-button>
           </div>
@@ -96,14 +78,9 @@
     <!-- :page-sizes="[2]" 每页固定数量，多个则可以选择每页显示数量-->
     <!-- layout里面有个sizes,加上就显示可以选择每页显示的数量-->
     <div class="pagination-container">
-      <el-pagination
-        v-model:current-page="pagination.currentPage"
-        v-model:page-size="pagination.pageSize"
-        :total="pagination.total"
-        layout="total, prev, pager, next"
-        @size-change="getModelList"
-        @current-change="getModelList"
-      />
+      <el-pagination v-model:current-page="pagination.currentPage" v-model:page-size="pagination.pageSize"
+        :total="pagination.total" layout="total, prev, pager, next" @size-change="getModelList"
+        @current-change="getModelList" />
     </div>
   </el-main>
 </template>
@@ -115,7 +92,7 @@ import {
   getModelMarketApi,
   userGetSelectLLMInfo,
   getModelKeysApi,
-//   userSetPrivateModelApi,
+  //   userSetPrivateModelApi,
 } from "@/api/managerApi";
 // import { currentUserId, getCurUserModel, setCurUserModel } from "@/composables/auth";
 import type { modelMarketEntity } from "@/store/modelMarektEntity";
@@ -192,7 +169,7 @@ onMounted(() => {
 
 // 拉取我的模型
 // 获取模型列表
-const getMyModelList = async (del:boolean) => {
+const getMyModelList = async (del: boolean) => {
   const res = useMyModelStore().models;
 
   console.log("0000000000000000   拉取我的模型=", res);
@@ -210,9 +187,9 @@ const getMyModelList = async (del:boolean) => {
   }
   if (ask) {
     let params = {
-        skip:0,
-        limit:10000,
-        sort:""
+      skip: 0,
+      limit: 10000,
+      sort: ""
     }
     const resp = await userGetSelectLLMInfo(params);
     if (resp.errcode === 0) {
@@ -222,13 +199,13 @@ const getMyModelList = async (del:boolean) => {
           for (let i = 0; i < resp.data[0].length; i++) {
             const rule = resp.data[0][i];
             const reqRule: ModelEntity = {
-              id: rule.model_id,
-              name: rule.name,
+              id: rule.map_id,
+              name: rule.model_name,
               provider: "",
-              address: rule.address,
-              input_price: rule.input_price,
-              output_price: rule.output_price,
-              cache_price: rule.cache_price,
+              address: rule.domain,
+              input_price: rule.model_input_price,
+              output_price: rule.model_output_price,
+              cache_price: rule.model_cache_price,
               latency: 0,
               health_score: 0,
               last_updated: rule.last_update,
@@ -244,20 +221,20 @@ const getMyModelList = async (del:boolean) => {
 };
 
 // 切换模型类型,模型市场不变，私有模型后，清理我的模型，返回得到私有的模型
-const handleModelTypeChange = async (type: number)=>{
-//   if (type === Number(modelType.value)) {
-//     return;
-//   }
-//   const userId = currentUserId.value;
-//   console.log("type === ", type)
-//   const res = await userSetPrivateModelApi(Number(userId), type);
-//   if (res.errcode === 0) {
-//     pagination.currentPage = 1;
-//     setCurUserModel(type);
-//     modelType.value = String(type);
-    
-//     getMyModelList(true);
-//   }
+const handleModelTypeChange = async (type: number) => {
+  //   if (type === Number(modelType.value)) {
+  //     return;
+  //   }
+  //   const userId = currentUserId.value;
+  //   console.log("type === ", type)
+  //   const res = await userSetPrivateModelApi(Number(userId), type);
+  //   if (res.errcode === 0) {
+  //     pagination.currentPage = 1;
+  //     setCurUserModel(type);
+  //     modelType.value = String(type);
+
+  //     getMyModelList(true);
+  //   }
 };
 
 // 拉取模型信息
@@ -279,7 +256,7 @@ const getModelList = async () => {
     if (respMarktes.data && respMarktes.data.length >= 2) {
       for (let i = 0; i < respMarktes.data[0].length; i++) {
         let dto: ModelMarketDTO = respMarktes.data[0][i];
-        let hasSub: boolean = isModleExistSubscribe(dto.info_model_id);
+        let hasSub: boolean = isModleExistSubscribe(dto.info_id);
         console.log("has sub === ", hasSub, "   ", dto);
         // if (dto.provider_deleted !== 0) {
         //   // 取供应商数据
@@ -298,21 +275,21 @@ const getModelList = async () => {
         //   };
         //   rules.value.push(mme);
         // } else {
-          // 取自己模型数据
-          let mme: modelMarketEntity = {
-            id: dto.info_model_id,
-            provider: dto.provider_provider_id,
-            name: dto.info_name,
-            address: dto.info_address,
-            input_price: dto.info_input_price,
-            output_price: dto.info_output_price,
-            cache_price: dto.info_cache_price,
-            latency: 0,
-            health_score: 0,
-            last_updated: dto.info_last_update,
-            subscribed: hasSub,
-          };
-          rules.value.push(mme);
+        // 取自己模型数据
+        let mme: modelMarketEntity = {
+          id: dto.info_id,
+          provider: dto.provider_provider_id,
+          name: dto.info_name,
+          address: dto.info_address,
+          input_price: dto.info_input_price,
+          output_price: dto.info_output_price,
+          cache_price: dto.info_cache_price,
+          latency: 0,
+          health_score: 0,
+          last_updated: dto.info_last_update,
+          subscribed: hasSub,
+        };
+        rules.value.push(mme);
         // }
       }
 
@@ -327,7 +304,7 @@ const getModelList = async () => {
 
 
 // 是否已经订阅了
-const isModleExistSubscribe = (id: string) => {
+const isModleExistSubscribe = (id: number) => {
   for (let i = 0; i < modelInfos.value.length; i++) {
     if (modelInfos.value[i].id === id) {
       return true;
@@ -361,7 +338,7 @@ const onClickSubscribe = async (rule: modelMarketEntity) => {
     return;
   }
 
-  let ids: Array<string> = [];
+  let ids: Array<number> = [];
   const existModels = useMyModelStore().models;
   if (existModels && existModels.length > 0) {
     for (let i = 0; i < existModels.length; i++) {
@@ -375,19 +352,22 @@ const onClickSubscribe = async (rule: modelMarketEntity) => {
   }
   ids.push(rule.id);
 
+  let model_ids: string[] = ids.map(id => id.toString());
+
+
   let usreq: UserSaveSelectLLMInfoReq = {
     user_id: Number(userId),
     select_models: [
       {
         node_id: "",
-        model_ids: ids,
+        model_ids: model_ids,
       },
     ],
   };
   const res1 = await subscribeModelApi(usreq);
   if (res1.errcode === 0) {
     // 发送订阅
-    const reqRule: ModelEntity ={
+    const reqRule: ModelEntity = {
       id: rule.id,
       name: rule.name,
       provider: rule.provider,
@@ -588,7 +568,8 @@ const formatTime = (timestamp: number) => {
 .pagination-container {
   display: flex;
   align-items: center;
-  justify-content: center; /* 关键：水平居中 */
+  justify-content: center;
+  /* 关键：水平居中 */
   margin-top: 20px;
   padding: 16px;
   background: white;
@@ -604,9 +585,11 @@ const formatTime = (timestamp: number) => {
 }
 
 .total-text {
-  margin-right: 15px; /* 与分页器间距 */
+  margin-right: 15px;
+  /* 与分页器间距 */
   color: #606266;
   font-size: 14px;
-  white-space: nowrap; /* 防止文字换行 */
+  white-space: nowrap;
+  /* 防止文字换行 */
 }
 </style>

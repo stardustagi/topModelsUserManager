@@ -2,82 +2,64 @@
   <el-main class="my-models-container">
     <div class="header-section">
       <h2 class="page-title">我的模型</h2>
-      <el-button
-        type="primary"
-        size="large"
-        class="refresh-btn"
-        @click="getModelList"
-      >
-        <el-icon><Refresh /></el-icon>
+      <el-button type="primary" size="large" class="refresh-btn" @click="getModelList">
+        <!-- <el-icon>
+          <Refresh />
+        </el-icon> -->
         刷新列表
       </el-button>
     </div>
 
     <el-scrollbar :style="{ height: scrollbarHeight }" class="models-scrollbar">
-      <VueDraggableNext
-        v-model="myModelInfos"
-        group="models"
-        handle=".drag-handle"
-      >
-        <div v-for="r in myModelInfos" :key="r.id" class="model-card">
-          <div class="card-header">
-            <el-icon class="drag-handle"><Rank /></el-icon>
-            <h3 class="model-name">{{ r.name }}</h3>
-            <!-- <el-tag type="primary" size="small" class="provider-tag">
+      <!-- <VueDraggableNext v-model="myModelInfos" group="models" handle=".drag-handle"> -->
+      <div v-for="r in myModelInfos" :key="r.id" class="model-card">
+        <div class="card-header">
+          <!-- <el-icon class="drag-handle">
+              <Rank />
+            </el-icon> -->
+          <h3 class="model-name">{{ r.name }}</h3>
+          <!-- <el-tag type="primary" size="small" class="provider-tag">
               {{ r.provider }}
             </el-tag> -->
-          </div>
+        </div>
 
-          <div class="model-details">
-            <div class="detail-row">
-              <span class="detail-label">输入价格:</span>
-              <span class="detail-value"
-                >¥{{ r.input_price / 100 }}/百万token</span
-              >
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">输出价格:</span>
-              <span class="detail-value"
-                >¥{{ r.output_price / 100 }}/百万token</span
-              >
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">缓存价格:</span>
-              <span class="detail-value"
-                >¥{{ r.cache_price / 100 }}/百万token</span
-              >
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">延迟:</span>
-              <span class="detail-value" :class="getLatencyClass(r.latency)">
-                {{ r.latency }}ms
-              </span>
-            </div>
-            <!-- <div class="detail-row">
+        <div class="model-details">
+          <div class="detail-row">
+            <span class="detail-label">输入价格:</span>
+            <span class="detail-value">¥{{ r.input_price / 100 }}/百万token</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">输出价格:</span>
+            <span class="detail-value">¥{{ r.output_price / 100 }}/百万token</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">缓存价格:</span>
+            <span class="detail-value">¥{{ r.cache_price / 100 }}/百万token</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">延迟:</span>
+            <span class="detail-value" :class="getLatencyClass(r.latency)">
+              {{ r.latency }}ms
+            </span>
+          </div>
+          <!-- <div class="detail-row">
               <span class="detail-label">性能:</span>
               <span class="detail-value">{{ r.health_score }} token/s</span>
             </div> -->
-            <!-- <div class="detail-row">
+          <!-- <div class="detail-row">
               <span class="detail-label">地址:</span>
               <span class="detail-value">{{ r.address }}</span>
             </div> -->
-          </div>
-
-          <div class="card-footer">
-            <span class="update-time"
-              >更新时间: {{ formatTime(r.last_updated) }}</span
-            >
-            <el-button
-              type="danger"
-              size="small"
-              class="unsubscribe-btn"
-              @click="onClickUnSubscribe(r)"
-            >
-              取消订阅
-            </el-button>
-          </div>
         </div>
-      </VueDraggableNext>
+
+        <div class="card-footer">
+          <span class="update-time">更新时间: {{ formatTime(r.last_updated) }}</span>
+          <el-button type="danger" size="small" class="unsubscribe-btn" @click="onClickUnSubscribe(r)">
+            取消订阅
+          </el-button>
+        </div>
+      </div>
+      <!-- </VueDraggableNext> -->
     </el-scrollbar>
 
     <!-- <el-scrollbar :style="{ height: scrollbarHeight }">
@@ -123,25 +105,26 @@ onMounted(() => {
 const getModelList = async () => {
   if (useMyModelStore().models.length <= 0) {
     let params = {
-        skip:0,
-        limit:10000,
-        sort:""
+      skip: 0,
+      limit: 10000,
+      sort: ""
     }
     const resp = await userGetSelectLLMInfo(params);
+    console.log("我的模型=== ", resp);
     if (resp.errcode === 0) {
       if (resp.data && resp.data.length >= 2) {
         if (resp.data[0]) {
-            myModelInfos.value = [];
+          myModelInfos.value = [];
           for (let i = 0; i < resp.data[0].length; i++) {
             const rule = resp.data[0][i];
             const reqRule: ModelEntity = {
-              id: rule.model_id,
-              name: rule.name,
+              id: rule.map_id,
+              name: rule.model_name,
               provider: "",
-              address: rule.address,
-              input_price: rule.input_price,
-              output_price: rule.output_price,
-              cache_price: rule.cache_price,
+              address: rule.domain,
+              input_price: rule.model_input_price,
+              output_price: rule.model_output_price,
+              cache_price: rule.model_cache_price,
               latency: 0,
               health_score: 0,
               last_updated: rule.last_update,
@@ -159,29 +142,29 @@ const getModelList = async () => {
 
 // 取消订阅
 const onClickUnSubscribe = async (rule: ModelEntity) => {
-    const userId = getToken().userId;
+  const userId = getToken().userId;
   if (!userId) {
     router.push("/login");
     return;
   }
   console.log("userid ====== ", userId);
 
-  let ids: Array<string> = [];
-    for (const m of myModelInfos.value) {
-        if (m.id !== rule.id) {
-            ids.push(m.id)
-        }
+  let ids: Array<number> = [];
+  for (const m of myModelInfos.value) {
+    if (m.id !== rule.id) {
+      ids.push(m.id)
     }
-    
+  }
+
 
   console.log("取消订阅的ID === ", rule.id);
-
+  let model_ids: string[] = ids.map(id => id.toString());
   let usreq: UserSaveSelectLLMInfoReq = {
     user_id: Number(userId),
     select_models: [
       {
         node_id: "",
-        model_ids: ids,
+        model_ids: model_ids,
       },
     ],
   };

@@ -116,7 +116,7 @@
                 <el-button
                   type="text"
                   class="action-btn"
-                  @click="copyText(row.apiKey)"
+                  @click="copyAllText(row)"
                 >
                   <el-icon><DocumentCopy /></el-icon>
                 </el-button>
@@ -228,9 +228,21 @@ const total = computed(() => apiKeysStore.keysCount);
 
 // 复制文本函数
 const copyText = async (text: string) => {
+  console.log("text ===== ", text);
   try {
-    await navigator.clipboard.writeText(text);
-    ElMessage.success("复制成功");
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+      ElMessage.success("复制成功");
+    } else {
+      // fallback 方法
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+      ElMessage.success("复制成功");
+    }
   } catch (err) {
     console.error("复制失败:", err);
     ElMessage.error("复制失败");
@@ -241,6 +253,31 @@ const copyText = async (text: string) => {
 const copyEndpoint = () => {
   copyText("http://localhost:8833");
 };
+
+// 复制整个key
+const copyAllText = async (row: any)=>{
+  const str = row.name+"|"+row.apiKey+"|"+row.status+"|"+row.createTime
+  console.log("all text = ",str);
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(str);
+      ElMessage.success("复制成功");
+    } else {
+      // fallback 方法
+      const textarea = document.createElement("textarea");
+      textarea.value = str;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+      ElMessage.success("复制成功");
+    }
+    
+  } catch (err) {
+    console.error("复制失败:", err);
+    ElMessage.error("复制失败");
+  }
+}
 
 // 处理状态变化
 const handleStatusChange = async (row: MyKeyItem, newVal: boolean|number|string) => {

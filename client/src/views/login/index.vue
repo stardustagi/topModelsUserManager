@@ -41,7 +41,7 @@
             </el-dropdown-item>
           </el-dropdown-menu>
         </template>
-      </el-dropdown> -->
+</el-dropdown> -->
     </div>
     <div class="login-container">
       <div class="img">
@@ -54,54 +54,31 @@
             <h2 class="outline-hidden">{{ title }}</h2>
           </Motion>
 
-          <el-form
-            v-if="currentPage === 0"
-            ref="ruleFormRef"
-            :model="ruleForm"
-            :rules="loginRules"
-            size="large"
-          >
+          <el-form v-if="currentPage === 0" ref="ruleFormRef" :model="ruleForm" :rules="loginRules" size="large">
             <Motion :delay="100">
-              <el-form-item
-                :rules="[
-                  {
-                    required: true,
-                    message: transformI18n($t('login.pureUsernameReg')),
-                    trigger: 'blur'
-                  }
-                ]"
-                prop="username"
-              >
-                <el-input
-                  v-model="ruleForm.username"
-                  clearable
-                  placeholder="用户名"
-                  :prefix-icon="useRenderIcon(User)"
-                />
+              <el-form-item :rules="[
+                {
+                  required: true,
+                  message: transformI18n($t('login.pureUsernameReg')),
+                  trigger: 'blur'
+                }
+              ]" prop="username">
+                <el-input v-model="ruleForm.username" clearable placeholder="用户名" :prefix-icon="useRenderIcon(User)" />
               </el-form-item>
             </Motion>
 
             <Motion :delay="150">
               <el-form-item prop="password">
-                <el-input
-                  v-model="ruleForm.password"
-                  clearable
-                  show-password
-                  :placeholder="t('login.purePassword')"
-                  :prefix-icon="useRenderIcon(Lock)"
-                />
+                <el-input v-model="ruleForm.password" clearable show-password :placeholder="t('login.purePassword')"
+                  :prefix-icon="useRenderIcon(Lock)" />
               </el-form-item>
             </Motion>
 
             <!--验证码-->
             <Motion :delay="200">
               <el-form-item prop="verifyCode">
-                <el-input
-                  v-model="ruleForm.verifyCode"
-                  clearable
-                  :placeholder="t('login.pureVerifyCode')"
-                  :prefix-icon="useRenderIcon(Keyhole)"
-                >
+                <el-input v-model="ruleForm.verifyCode" clearable :placeholder="t('login.pureVerifyCode')"
+                  :prefix-icon="useRenderIcon(Keyhole)">
                   <template v-slot:append>
                     <ReImageVerify v-model:code="imgCode" />
                   </template>
@@ -110,14 +87,8 @@
             </Motion>
 
             <Motion :delay="250">
-              <el-button
-                class="w-full mt-4! mb-4!"
-                size="default"
-                type="primary"
-                :loading="loading"
-                :disabled="disabled"
-                @click="onLogin(ruleFormRef)"
-              >
+              <el-button class="w-full mt-4! mb-4!" size="default" type="primary" :loading="loading"
+                :disabled="disabled" @click="onLogin(ruleFormRef)">
                 {{ t("login.pureLogin") }}
               </el-button>
             </Motion>

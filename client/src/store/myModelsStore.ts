@@ -18,7 +18,7 @@ export const useMyModelStore = defineStore("mymodel", () => {
     }
   };
 
-  const removeModel = (id: string) => {
+  const removeModel = (id: number) => {
     models.value = models.value.filter(m => m.id != id);
   };
 
