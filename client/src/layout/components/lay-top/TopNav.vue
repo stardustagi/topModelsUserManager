@@ -13,56 +13,57 @@
     </div>
 
     <div class="right-content">
-      <div v-if="isLoggedIn">
+      <!-- <div v-if="username"> -->
+      <div>
         <el-dropdown trigger="click">
           <span class="el-dropdown-link navbar-bg-hover">
             <!-- <img :src="userAvatar" :style="avatarsStyle" /> -->
             <!-- <p v-if="username" class="dark:text-white">{{ username }}</p> -->
-            <p>{{ useStore.username }}</p>
+            <!-- <p>{{ useStore.username }}</p> -->
+            <p v-if="username" class="dark:text-white">{{ username }}</p>
           </span>
           <template #dropdown>
             <el-dropdown-menu class="logout">
               <el-dropdown-item @click="logout">
-                <IconifyIconOffline
-                  :icon="LogoutCircleRLine"
-                  style="margin: 5px"
-                />
-                {{ t("buttons.pureLoginOut") }}
+                <IconifyIconOffline :icon="LogoutCircleRLine" style="margin: 5px" />
+                <!-- {{ t("buttons.pureLoginOut") }} -->
               </el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
       </div>
-      <div v-else>
+      <!-- <div v-else>
         <div class="flex items-center space-x-4 ml-4">
           <el-button plain round @click="onLogin">登录</el-button>
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-const { logout } = useNav();
+const { logout, username } = useNav();
 
 import { useNav } from "@/layout/hooks/useNav";
 import { useTranslationLang } from "@/layout/hooks/useTranslationLang";
 import LogoutCircleRLine from "~icons/ri/logout-circle-r-line";
 // import { isLoggedIn } from "@/utils/auth";
-import { useUserStoreHook } from "@/store/modules/user";
+// import { useUserStoreHook } from "@/store/modules/user";
 import { useRouter } from "vue-router";
-import { computed } from "vue";
-import { getToken } from "@/utils/auth";
-const { t } = useTranslationLang();
+// import { computed } from "vue";
+// import { getToken } from "@/utils/auth";
+// const { t } = useTranslationLang();
 const router = useRouter();
-const useStore = useUserStoreHook();
+// const useStore = useUserStoreHook();
 
-const isLoggedIn = computed(() => {
-  const token = getToken();
-  console.log(useStore.username, "   000");
-  // console.log("token ==666 ", token?.accessToken);
-  return !!token?.accessToken;
-});
+// const username = computed(() => useStore.username);
+
+// const isLoggedIn = computed(() => {
+//   const token = getToken();
+//   console.log(useStore.username, "   000");
+//   // console.log("token ==666 ", token?.accessToken);
+//   return !!token?.accessToken;
+// });
 
 const onLogin = () => {
   router.push("/login");

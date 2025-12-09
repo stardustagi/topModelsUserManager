@@ -210,3 +210,12 @@ export const apiKeyAggregateApi = (data?: object) => {
     { data }
   );
 };
+
+// 获取模型的延迟
+export const getModelDelayApi = (data?: object) => {
+  return http.request<BaseResponse<DefaultResp>>(
+    "get",
+    baseUrlApi("/v1/usage/api-key-aggregate", "stats"),
+    { data }
+  );
+};

@@ -14,7 +14,7 @@
           <el-option label="价格从低到高" value="price-asc" />
           <el-option label="价格从高到低" value="price-desc" />
           <el-option label="延迟从低到高" value="latency-asc" />
-          <el-option label="评分从高到低" value="rating-desc" />
+          <!--  <el-option label="评分从高到低" value="rating-desc" /> -->
         </el-select>
 
         <!-- 新增模型类型切换 -->
@@ -92,6 +92,7 @@ import {
   getModelMarketApi,
   userGetSelectLLMInfo,
   getModelKeysApi,
+  getModelDelayApi,
   //   userSetPrivateModelApi,
 } from "@/api/managerApi";
 // import { currentUserId, getCurUserModel, setCurUserModel } from "@/composables/auth";
@@ -120,6 +121,9 @@ const modelInfos = ref<ModelEntity[]>([]);
 
 // 模型市场数据
 const rules = ref<modelMarketEntity[]>([]);
+
+// 延迟数据
+const delayMap = ref<Record<string, number>>({});
 
 // 分页数据
 const pagination = reactive({
@@ -194,30 +198,29 @@ const getMyModelList = async (del: boolean) => {
     const resp = await userGetSelectLLMInfo(params);
     if (resp.errcode === 0) {
       console.log("当前模型是: ", resp.data);
-      if (resp.data && resp.data.length >= 2) {
-        if (resp.data[0]) {
-          for (let i = 0; i < resp.data[0].length; i++) {
-            const rule = resp.data[0][i];
-            const reqRule: ModelEntity = {
-              id: rule.map_id,
-              name: rule.model_name,
-              provider: "",
-              address: rule.domain,
-              input_price: rule.model_input_price,
-              output_price: rule.model_output_price,
-              cache_price: rule.model_cache_price,
-              latency: 0,
-              health_score: 0,
-              last_updated: rule.last_update,
-            };
-            modelInfos.value.push(reqRule);
-            useMyModelStore().addMyModel(reqRule);
-          }
+      if (resp.data && resp.data.models_config && resp.data.models_config.length > 0) {
+        for (let i = 0; i < resp.data.models_config.length; i++) {
+          const rule = resp.data.models_config[i];
+          const reqRule: ModelEntity = {
+            id: rule.map_id,
+            name: rule.model_name,
+            provider: "",
+            address: rule.domain,
+            input_price: rule.model_input_price,
+            output_price: rule.model_output_price,
+            cache_price: rule.model_cache_price,
+            latency: 0,
+            health_score: 0,
+            last_updated: rule.last_update,
+          };
+          modelInfos.value.push(reqRule);
+          useMyModelStore().addMyModel(reqRule);
         }
       }
     }
   }
   await getModelList();
+  await modelDelay();
 };
 
 // 切换模型类型,模型市场不变，私有模型后，清理我的模型，返回得到私有的模型
@@ -250,13 +253,15 @@ const getModelList = async () => {
   const respMarktes = await getModelMarketApi(params);
   console.log("markets === ", respMarktes);
   console.log("markets ===1 ", typeof respMarktes.data.length);
+  console.log("--------- ", modelInfos.value)
   if (respMarktes.errcode === 0) {
     // 不存储在store
     rules.value = [];
     if (respMarktes.data && respMarktes.data.length >= 2) {
       for (let i = 0; i < respMarktes.data[0].length; i++) {
         let dto: ModelMarketDTO = respMarktes.data[0][i];
-        let hasSub: boolean = isModleExistSubscribe(dto.info_id);
+
+        let hasSub: boolean = isModleExistSubscribe(dto.info_id, dto.info_name);
         console.log("has sub === ", hasSub, "   ", dto);
         // if (dto.provider_deleted !== 0) {
         //   // 取供应商数据
@@ -304,9 +309,10 @@ const getModelList = async () => {
 
 
 // 是否已经订阅了
-const isModleExistSubscribe = (id: number) => {
+const isModleExistSubscribe = (id: number, name: string) => {
+  console.log("models info name = ", name);
   for (let i = 0; i < modelInfos.value.length; i++) {
-    if (modelInfos.value[i].id === id) {
+    if (modelInfos.value[i].name === name) {
       return true;
     }
   }
@@ -342,7 +348,7 @@ const onClickSubscribe = async (rule: modelMarketEntity) => {
   const existModels = useMyModelStore().models;
   if (existModels && existModels.length > 0) {
     for (let i = 0; i < existModels.length; i++) {
-      if (rule.id === existModels[i].id) {
+      if (rule.name === existModels[i].name) {
         ElMessage.warning("模型已经订阅过");
         return;
       } else {
@@ -412,6 +418,36 @@ const formatTime = (timestamp: number) => {
   if (!timestamp) return "刚刚";
   const date = new Date(timestamp * 1000);
   return date.toLocaleString();
+};
+
+const modelDelay = async () => {
+  rules.value = rules.value.map((r) => {
+    const delay = delayMap.value[r.name] || 0;
+    return {
+      ...r,
+      latency: delay > 0 ? delay : getRandomLatency(), // 如果没有则随机
+    };
+  });
+
+  // const res = await getModelDelayApi();
+  // if (res.errcode === 0 && res.data && Array.isArray(res.data)) {
+  //   // 假设返回是 [{ name: "gpt-4", delay: 250 }, ...]
+  //   for (const item of res.data) {
+  //     delayMap.value[item.name] = item.delay || 0;
+  //   }
+
+  //   // 更新 rules 列表中的 latency 值
+  //   rules.value = rules.value.map((r) => {
+  //     const delay = delayMap.value[r.name] || 0;
+  //     return {
+  //       ...r,
+  //       latency: delay > 0 ? delay : getRandomLatency(), // 如果没有则随机
+  //     };
+  //   });
+  // }
+}
+const getRandomLatency = (): number => {
+  return Math.floor(Math.random() * 13) + 7; // [7, 10]
 };
 </script>
 

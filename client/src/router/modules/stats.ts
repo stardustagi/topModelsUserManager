@@ -9,7 +9,8 @@ export default {
   meta: {
     icon: "ri/information-line",
     title: "统计服务",
-    rank: 9
+    rank: 9,
+    showLink: false
   },
   children: [
     {

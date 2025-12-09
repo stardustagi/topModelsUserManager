@@ -32,17 +32,10 @@ const { t, locale, translationCh, translationEn } = useTranslationLang();
 
 <template>
   <div class="navbar bg-[#fff] shadow-xs shadow-[rgba(0,21,41,0.08)]">
-    <LaySidebarTopCollapse
-      v-if="device === 'mobile'"
-      class="hamburger-container"
-      :is-active="pureApp.sidebar.opened"
-      @toggleClick="toggleSideBar"
-    />
+    <LaySidebarTopCollapse v-if="device === 'mobile'" class="hamburger-container" :is-active="pureApp.sidebar.opened"
+      @toggleClick="toggleSideBar" />
 
-    <LaySidebarBreadCrumb
-      v-if="layout !== 'mix' && device !== 'mobile'"
-      class="breadcrumb-container"
-    />
+    <LaySidebarBreadCrumb v-if="layout !== 'mix' && device !== 'mobile'" class="breadcrumb-container" />
 
     <LayNavMix v-if="layout === 'mix'" />
 
@@ -51,28 +44,16 @@ const { t, locale, translationCh, translationEn } = useTranslationLang();
       <LaySearch id="header-search" />
       <!-- 国际化 -->
       <el-dropdown id="header-translation" trigger="click">
-        <GlobalizationIcon
-          class="navbar-bg-hover w-[40px] h-[48px] p-[11px] cursor-pointer outline-hidden"
-        />
+        <GlobalizationIcon class="navbar-bg-hover w-[40px] h-[48px] p-[11px] cursor-pointer outline-hidden" />
         <template #dropdown>
           <el-dropdown-menu class="translation">
-            <el-dropdown-item
-              :style="getDropdownItemStyle(locale, 'zh')"
-              :class="['dark:text-white!', getDropdownItemClass(locale, 'zh')]"
-              @click="translationCh"
-            >
-              <IconifyIconOffline
-                v-show="locale === 'zh'"
-                class="check-zh"
-                :icon="Check"
-              />
+            <el-dropdown-item :style="getDropdownItemStyle(locale, 'zh')"
+              :class="['dark:text-white!', getDropdownItemClass(locale, 'zh')]" @click="translationCh">
+              <IconifyIconOffline v-show="locale === 'zh'" class="check-zh" :icon="Check" />
               简体中文
             </el-dropdown-item>
-            <el-dropdown-item
-              :style="getDropdownItemStyle(locale, 'en')"
-              :class="['dark:text-white!', getDropdownItemClass(locale, 'en')]"
-              @click="translationEn"
-            >
+            <el-dropdown-item :style="getDropdownItemStyle(locale, 'en')"
+              :class="['dark:text-white!', getDropdownItemClass(locale, 'en')]" @click="translationEn">
               <span v-show="locale === 'en'" class="check-en">
                 <IconifyIconOffline :icon="Check" />
               </span>
@@ -94,20 +75,13 @@ const { t, locale, translationCh, translationEn } = useTranslationLang();
         <template #dropdown>
           <el-dropdown-menu class="logout">
             <el-dropdown-item @click="logout">
-              <IconifyIconOffline
-                :icon="LogoutCircleRLine"
-                style="margin: 5px"
-              />
+              <IconifyIconOffline :icon="LogoutCircleRLine" style="margin: 5px" />
               {{ t("buttons.pureLoginOut") }}
             </el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
-      <span
-        class="set-icon navbar-bg-hover"
-        :title="t('buttons.pureOpenSystemSet')"
-        @click="onPanel"
-      >
+      <span class="set-icon navbar-bg-hover" :title="t('buttons.pureOpenSystemSet')" @click="onPanel">
         <IconifyIconOffline :icon="Setting" />
       </span>
     </div>

@@ -112,26 +112,24 @@ const getModelList = async () => {
     const resp = await userGetSelectLLMInfo(params);
     console.log("我的模型=== ", resp);
     if (resp.errcode === 0) {
-      if (resp.data && resp.data.length >= 2) {
-        if (resp.data[0]) {
-          myModelInfos.value = [];
-          for (let i = 0; i < resp.data[0].length; i++) {
-            const rule = resp.data[0][i];
-            const reqRule: ModelEntity = {
-              id: rule.map_id,
-              name: rule.model_name,
-              provider: "",
-              address: rule.domain,
-              input_price: rule.model_input_price,
-              output_price: rule.model_output_price,
-              cache_price: rule.model_cache_price,
-              latency: 0,
-              health_score: 0,
-              last_updated: rule.last_update,
-            };
-            myModelInfos.value.push(reqRule);
-            useMyModelStore().addMyModel(reqRule);
-          }
+      if (resp.data && resp.data.models_config && resp.data.models_config.length > 0) {
+        myModelInfos.value = [];
+        for (let i = 0; i < resp.data.models_config.length; i++) {
+          const rule = resp.data.models_config[i];
+          const reqRule: ModelEntity = {
+            id: rule.map_id,
+            name: rule.model_name,
+            provider: "",
+            address: rule.domain,
+            input_price: rule.model_input_price,
+            output_price: rule.model_output_price,
+            cache_price: rule.model_cache_price,
+            latency: 0,
+            health_score: 0,
+            last_updated: rule.last_update,
+          };
+          myModelInfos.value.push(reqRule);
+          useMyModelStore().addMyModel(reqRule);
         }
       }
     }

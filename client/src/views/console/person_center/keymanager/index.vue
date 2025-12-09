@@ -3,13 +3,10 @@
     <!-- 标题和按钮区域 -->
     <div class="header">
       <h2>我的KEY</h2>
-      <el-button
-        type="primary"
-        size="large"
-        class="add-key-btn"
-        @click="addNewKey"
-      >
-        <el-icon><Plus /></el-icon> 新增Key
+      <el-button type="primary" size="large" class="add-key-btn" @click="addNewKey">
+        <el-icon>
+          <Plus />
+        </el-icon> 新增Key
       </el-button>
     </div>
 
@@ -22,15 +19,13 @@
     <div class="endpoint-section">
       <div class="endpoint-label">
         <span class="endpoint-label">Endpoint URL：</span>
-        <span class="endpoint-url">http://localhost:8833</span>
+        <span class="endpoint-url">https://users.topapi.ai</span>
       </div>
       <el-tooltip content="复制Endpoint" placement="top">
-        <el-button
-          type="primary"
-          class="copy-endpoint-btn"
-          @click="copyEndpoint"
-        >
-          <el-icon><DocumentCopy /></el-icon>
+        <el-button type="primary" class="copy-endpoint-btn" @click="copyEndpoint">
+          <el-icon>
+            <DocumentCopy />
+          </el-icon>
           复制
         </el-button>
       </el-tooltip>
@@ -38,24 +33,12 @@
 
     <!-- 表格区域 -->
     <div class="table-container">
-      <el-table
-        :data="apiKeysStore.apiKeys"
-        style="width: 100%"
-        class="keys-table"
-      >
-        <el-table-column
-          prop="name"
-          label="Key名称"
-          width="180"
-        ></el-table-column>
+      <el-table :data="apiKeysStore.apiKeys" style="width: 100%" class="keys-table">
+        <el-table-column prop="name" label="Key名称" width="180"></el-table-column>
 
         <el-table-column prop="status" label="状态" width="120">
           <template #default="{ row }">
-            <el-tag
-              :type="row.status === '1' ? 'success' : 'danger'"
-              size="small"
-              effect="dark"
-            >
+            <el-tag :type="row.status === '1' ? 'success' : 'danger'" size="small" effect="dark">
               {{ row.status === "1" ? "启用" : "禁用" }}
             </el-tag>
           </template>
@@ -66,61 +49,41 @@
             <div class="api-key-container">
               <span class="api-key-text">{{ maskApiKey(row.apiKey) }}</span>
               <el-tooltip content="复制Key" placement="top">
-                <el-button
-                  type="text"
-                  class="copy-key-btn"
-                  @click="copyText(row.apiKey)"
-                >
-                  <el-icon><DocumentCopy /></el-icon>
+                <el-button type="text" class="copy-key-btn" @click="copyText(row.apiKey)">
+                  <el-icon>
+                    <DocumentCopy />
+                  </el-icon>
                 </el-button>
               </el-tooltip>
             </div>
           </template>
         </el-table-column>
 
-        <el-table-column
-          prop="createTime"
-          label="创建时间"
-          width="180"
-        ></el-table-column>
+        <el-table-column prop="createTime" label="创建时间" width="180"></el-table-column>
 
         <el-table-column label="操作" width="200">
           <template #default="{ row }">
             <div class="action-buttons">
-              <el-tooltip
-                :content="row.status === '1' ? '禁用此Key' : '启用此Key'"
-                placement="top"
-              >
-                <el-switch
-                  :model-value="row.status === '1'"
-                  inline-prompt
-                  active-text="启用"
-                  inactive-text="禁用"
-                  @change="handleStatusChange(row, $event)"
-                  class="status-switch"
-                ></el-switch>
+              <el-tooltip :content="row.status === '1' ? '禁用此Key' : '启用此Key'" placement="top">
+                <el-switch :model-value="row.status === '1'" inline-prompt active-text="启用" inactive-text="禁用"
+                  @change="handleStatusChange(row, $event)" class="status-switch"></el-switch>
               </el-tooltip>
 
               <el-tooltip content="删除Key" placement="top">
-                <el-button
-                  type="danger"
-                  size="small"
-                  class="delete-btn"
-                  @click="deleteKey(row)"
-                >
-                  <el-icon><Delete /></el-icon>
+                <el-button type="danger" size="small" class="delete-btn" @click="deleteKey(row)">
+                  <el-icon>
+                    <Delete />
+                  </el-icon>
                 </el-button>
               </el-tooltip>
 
-              <el-tooltip content="复制Key" placement="top">
-                <el-button
-                  type="text"
-                  class="action-btn"
-                  @click="copyAllText(row)"
-                >
-                  <el-icon><DocumentCopy /></el-icon>
+              <!-- <el-tooltip content="复制Key" placement="top">
+                <el-button type="text" class="action-btn" @click="copyAllText(row)">
+                  <el-icon>
+                    <DocumentCopy />
+                  </el-icon>
                 </el-button>
-              </el-tooltip>
+              </el-tooltip> -->
             </div>
           </template>
         </el-table-column>
@@ -218,7 +181,7 @@ onMounted(() => {
 const loadApikeys = async () => {
   if (apiKeysStore.keysCount === 0) {
     const res = await getModelKeysApi();
-    console.log("服务拉取apikey=",res);
+    console.log("服务拉取apikey=", res);
     let keys: MyKeyItem[] = apiKeysStore.convertToMyKeyItems(res.data.api_keys);
     apiKeysStore.setApiKeys(keys);
   }
@@ -251,13 +214,13 @@ const copyText = async (text: string) => {
 
 // 复制 Endpoint
 const copyEndpoint = () => {
-  copyText("http://localhost:8833");
+  copyText("https://users.topapi.ai");
 };
 
 // 复制整个key
-const copyAllText = async (row: any)=>{
-  const str = row.name+"|"+row.apiKey+"|"+row.status+"|"+row.createTime
-  console.log("all text = ",str);
+const copyAllText = async (row: any) => {
+  const str = row.name + "|" + row.apiKey + "|" + row.status + "|" + row.createTime
+  console.log("all text = ", str);
   try {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       await navigator.clipboard.writeText(str);
@@ -272,7 +235,7 @@ const copyAllText = async (row: any)=>{
       document.body.removeChild(textarea);
       ElMessage.success("复制成功");
     }
-    
+
   } catch (err) {
     console.error("复制失败:", err);
     ElMessage.error("复制失败");
@@ -280,10 +243,10 @@ const copyAllText = async (row: any)=>{
 }
 
 // 处理状态变化
-const handleStatusChange = async (row: MyKeyItem, newVal: boolean|number|string) => {
+const handleStatusChange = async (row: MyKeyItem, newVal: boolean | number | string) => {
   const boolVal = Boolean(newVal);
   row.status = boolVal ? "1" : "0";
-   const parasm = {api_keys:apiKeysStore.toServerData}
+  const parasm = { api_keys: apiKeysStore.toServerData }
   const setResp = await setModelKeysApi(parasm);
   if (setResp.errcode === 0) {
     if (boolVal) {
@@ -342,7 +305,7 @@ const addNewKey = async () => {
     const toServer = keys.map(
       (item) => `${item.name}|${item.apiKey}|${item.status}|${item.createTime}`
     );
-    const parasm = {api_keys:toServer}
+    const parasm = { api_keys: toServer }
     const resp = await setModelKeysApi(parasm);
     console.log("resp ================== ", resp);
     if (resp.errcode === 0) {

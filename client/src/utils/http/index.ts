@@ -110,7 +110,6 @@ class PureHttp {
                   }
                   resolve(PureHttp.retryOriginalRequest(config));
                 } else {
-                  console.log("222222222222222222222222222222");
                   config.headers["jwt"] = formatToken(data.accessToken);
                   config.headers["id"] = data.userId;
                   resolve(config);

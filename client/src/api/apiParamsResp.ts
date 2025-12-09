@@ -126,7 +126,10 @@ export interface UserSelectModelDTO {
 export interface UserSelectModelResp {
   errcode: number;
   msg: string;
-  data: [UserSelectModelDTO[], PageDataResp[]];
+  data: {
+    id: number;
+    models_config: UserSelectModelDTO[];
+  };
 }
 
 // 模型实体

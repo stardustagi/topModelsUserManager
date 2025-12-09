@@ -182,13 +182,11 @@ import LoginUpdate from "@/views/login/components/LoginUpdate.vue";
 import dayIcon from "@/assets/svg/day.svg?component";
 import darkIcon from "@/assets/svg/dark.svg?component";
 import globalization from "@/assets/svg/globalization.svg?component";
-import Keyhole from "~icons/ri/shield-keyhole-line";
-import Lock from "~icons/ri/lock-fill";
 import Check from "~icons/ep/check";
-import User from "~icons/ri/user-3-fill";
 import { accountLoginApi, apikeyLoginApi, nodeUserEmailLoginApi } from "@/api/managerApi";
 import { usePermissionStoreHook } from "@/store/modules/permission";
-import { setRoles } from "@/utils/auth";
+import { setRoles, syncUserStoreFromStorage } from "@/utils/auth";
+import { Keyhole, Lock, User } from "@icon-park/vue-next";
 
 defineOptions({
   name: "Login"
@@ -278,7 +276,8 @@ const onLogin = async (formEl: FormInstance | undefined) => {
             addPathMatch();
             console.log(getTopMenu(true).path, "          new path");
             // router.push(getTopMenu(true).path);
-            router.push("/welcome");
+            syncUserStoreFromStorage();
+            router.push("/console/person_center/keymanager");
             message("登录成功", { type: "success" });
             loading.value = false;
           }
@@ -309,6 +308,51 @@ const onLogin = async (formEl: FormInstance | undefined) => {
     }
   });
 };
+
+// const onLogin = async (formEl: FormInstance | undefined) => {
+//   if (!formEl) return;
+
+//   await formEl.validate(async valid => {
+//     if (!valid) return;
+//     const tempTime = useUserStoreHook()?.imageCodeTime || "";
+//     loading.value = true;
+//     try {
+//       const res = await accountLoginApi({
+//         user_name: ruleForm.username,
+//         password: ruleForm.password,
+//         graph_verify_code: ruleForm.verifyCode,
+//         t: tempTime
+//       });
+
+//       if (res.errcode === 0) {
+//         // 写入 localStorage & pinia
+//         setRoles(res.data.user_info.is_admin, res.data.user_info.user_name);
+
+//         // 同步 pinia（很重要）
+//         // syncUserStoreFromStorage();
+
+//         // 处理权限
+//         usePermissionStoreHook().handleWholeMenus([]);
+//         addPathMatch();
+
+//         // =============================
+//         // 🚀 关键：先跳转 redirect 强制刷新组件
+//         // =============================
+//         await router.replace("/blank_redirect");
+
+//         // 再跳转真正页面
+//         // await router.replace("/console/person_center/keymanager");
+
+//         message("登录成功", { type: "success" });
+//       }
+//     } catch (err) {
+//       console.error("登录失败: ", err);
+//     } finally {
+//       loading.value = false;
+//     }
+//   });
+// };
+
 
 const immediateDebounce: any = debounce(
   formRef => onLogin(formRef),

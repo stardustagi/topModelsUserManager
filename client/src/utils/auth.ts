@@ -152,7 +152,8 @@ export function setRoles(isAdmin: number, username: string) {
 
   const userId =
     storageLocal().getItem<DataInfo<number>>(userKey)?.userId ?? "";
-  useUserStoreHook().SET_USERNAME(username);
+  const userStore = useUserStoreHook();
+  userStore.SET_USERNAME(username);
   storageLocal().setItem(userKey, {
     refreshToken: "",
     expires: 0,
@@ -163,6 +164,20 @@ export function setRoles(isAdmin: number, username: string) {
     permissions: [],
     userId: userId
   });
+}
+
+export function syncUserStoreFromStorage() {
+  const raw = storageLocal().getItem<DataInfo<number>>(userKey);
+  const userStore = useUserStoreHook();
+
+  if (raw) {
+    userStore.SET_USERNAME(raw.username || "");
+    userStore.SET_AVATAR(raw.avatar || "");
+    userStore.SET_NICKNAME(raw.nickname || "");
+    userStore.SET_USERID(raw.userId || "");
+    userStore.SET_ROLES(raw.roles || []);
+    userStore.SET_PERMS(raw.permissions || []);
+  }
 }
 
 /** 删除`token`以及key值为`user-info`的localStorage信息 */
