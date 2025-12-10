@@ -2,7 +2,7 @@
   <el-main class="my-models-container">
     <div class="header-section">
       <h2 class="page-title">我的模型</h2>
-      <el-button type="primary" size="large" class="refresh-btn" @click="getModelList">
+      <el-button type="primary" size="large" class="refresh-btn" @click="refreshAll">
         <!-- <el-icon>
           <Refresh />
         </el-icon> -->
@@ -12,7 +12,7 @@
 
     <el-scrollbar :style="{ height: scrollbarHeight }" class="models-scrollbar">
       <!-- <VueDraggableNext v-model="myModelInfos" group="models" handle=".drag-handle"> -->
-      <div v-for="r in myModelInfos" :key="r.id" class="model-card">
+      <div v-for="r in myModelInfos" :key="r.map_node_id + '-' + r.map_model_id" class="model-card">
         <div class="card-header">
           <!-- <el-icon class="drag-handle">
               <Rank />
@@ -42,14 +42,6 @@
               {{ r.latency }}ms
             </span>
           </div>
-          <!-- <div class="detail-row">
-              <span class="detail-label">性能:</span>
-              <span class="detail-value">{{ r.health_score }} token/s</span>
-            </div> -->
-          <!-- <div class="detail-row">
-              <span class="detail-label">地址:</span>
-              <span class="detail-value">{{ r.address }}</span>
-            </div> -->
         </div>
 
         <div class="card-footer">
@@ -61,22 +53,6 @@
       </div>
       <!-- </VueDraggableNext> -->
     </el-scrollbar>
-
-    <!-- <el-scrollbar :style="{ height: scrollbarHeight }">
-      <VueDraggableNext v-model="modelInfos" group="test">
-        <Card v-for="r in modelInfos" :key="r.id" class="rules-item">
-          <div class="rules-content">
-            <div>{{ r.name }}</div>
-          </div>
-
-          <div class="rules-action">
-            <el-button type="primary" @click="onClickUnSubscribe(r)"
-              >取消订阅</el-button
-            >
-          </div>
-        </Card>
-      </VueDraggableNext>
-    </el-scrollbar> -->
   </el-main>
 </template>
 
@@ -87,19 +63,38 @@ import { useRouter } from "vue-router";
 import { ModelEntity } from "@/api/apiParamsResp";
 import { getToken } from "@/utils/auth";
 import { useMyModelStore } from "@/store/myModelsStore";
-// import { currentUserId } from "@/composables/auth";
+import { useLatencyStore } from "@/store/latencyStore";
 
 
 const myModelInfos = ref<ModelEntity[]>([]);
-// const myModelStore = useMyModelStore();
 const router = useRouter();
 const scrollbarHeight = ref("500px"); // 默认高度
+const latencyStore = useLatencyStore();
 
 
-onMounted(() => {
+onMounted(async () => {
   setScrollbarHeight();
-  getModelList();
+  await getModelList();
+  await refreshLatency();
 });
+
+// 刷新所有
+const refreshAll = async () => {
+  await getModelList();
+
+  // 或强制刷新延迟
+  const nodeIds = Array.from(
+    new Set(myModelInfos.value.map(r => r.map_node_id).filter(id => !!id))
+  );
+
+  await latencyStore.refreshLatency(nodeIds);
+
+  myModelInfos.value = myModelInfos.value.map(r => ({
+    ...r,
+    latency: latencyStore.getLatency(r.map_node_id)
+  }));
+};
+
 
 // 获取模型列表
 const getModelList = async () => {
@@ -117,7 +112,7 @@ const getModelList = async () => {
         for (let i = 0; i < resp.data.models_config.length; i++) {
           const rule = resp.data.models_config[i];
           const reqRule: ModelEntity = {
-            id: rule.map_id,
+            // id: rule.map_id,
             name: rule.model_name,
             provider: "",
             address: rule.domain,
@@ -127,6 +122,8 @@ const getModelList = async () => {
             latency: 0,
             health_score: 0,
             last_updated: rule.last_update,
+            map_node_id: rule.map_node_id,
+            map_model_id: rule.map_model_id,
           };
           myModelInfos.value.push(reqRule);
           useMyModelStore().addMyModel(reqRule);
@@ -147,32 +144,31 @@ const onClickUnSubscribe = async (rule: ModelEntity) => {
   }
   console.log("userid ====== ", userId);
 
-  let ids: Array<number> = [];
-  for (const m of myModelInfos.value) {
-    if (m.id !== rule.id) {
-      ids.push(m.id)
-    }
-  }
+  const nodeIdStr = String(rule.map_node_id);
+  const modelIds = myModelInfos.value
+    .filter(
+      m => m.map_node_id === rule.map_node_id && m.map_model_id !== rule.map_model_id
+    )
+    .map(m => String(m.map_model_id));
 
+  // 如果已经是最后一个模型，取消后就这个节点下没有模型了，可以考虑直接删除该节点
 
-  console.log("取消订阅的ID === ", rule.id);
-  let model_ids: string[] = ids.map(id => id.toString());
-  let usreq: UserSaveSelectLLMInfoReq = {
+  const usreq: UserSaveSelectLLMInfoReq = {
     user_id: Number(userId),
     select_models: [
       {
-        node_id: "",
-        model_ids: model_ids,
+        node_id: nodeIdStr,
+        model_ids: modelIds,
       },
     ],
   };
 
-  console.log("取消req = ", usreq);
-
   const res1 = await unsubscribeModelApi(usreq);
   if (res1.errcode === 0) {
-    myModelInfos.value = myModelInfos.value.filter((model) => model.id !== rule.id);
-    useMyModelStore().removeModel(rule.id);
+    myModelInfos.value = myModelInfos.value.filter(
+      m => !(m.map_node_id === rule.map_node_id && m.map_model_id === rule.map_model_id)
+    );
+    useMyModelStore().removeModel(rule.map_node_id, rule.map_model_id);
   }
   getModelList();
 };
@@ -196,6 +192,22 @@ const formatTime = (timestamp: number) => {
   const date = new Date(timestamp * 1000);
   return date.toLocaleString();
 };
+
+// 刷新延迟
+const refreshLatency = async () => {
+  console.log("my model info = ", myModelInfos.value);
+  const nodeIds = Array.from(
+    new Set(myModelInfos.value.map(r => r.map_node_id).filter(id => !!id))
+  );
+  console.log("my node ids === ", nodeIds);
+  await latencyStore.loadLatency(nodeIds);
+
+  myModelInfos.value = myModelInfos.value.map(r => ({
+    ...r,
+    latency: latencyStore.getLatency(r.map_node_id)
+  }));
+};
+
 </script>
 
 

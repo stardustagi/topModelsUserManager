@@ -140,7 +140,7 @@ class PureHttp {
         // 设置token
         const jwt = response.headers["jwt"];
         const userId = response.headers["id"];
-        console.log("response ==== ", response);
+        // console.log("response ==== ", response);
         if (jwt && userId) {
           const di: DataInfo<number> = {
             accessToken: jwt,

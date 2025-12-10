@@ -11,15 +11,21 @@ export const useMyModelStore = defineStore("mymodel", () => {
   //     models.value = newModels.map(m => model.Model.createFrom(m));
   // };
 
+  const isSameModel = (a: ModelEntity, b: ModelEntity) => {
+    return a.map_node_id === b.map_node_id && a.map_model_id === b.map_model_id;
+  };
+
   const addMyModel = (newModel: ModelEntity) => {
-    const exists = models.value.some(m => newModel.id === m.id);
+    const exists = models.value.some(m => isSameModel(m, newModel));
     if (!exists) {
       models.value.push(newModel);
     }
   };
 
-  const removeModel = (id: number) => {
-    models.value = models.value.filter(m => m.id != id);
+  const removeModel = (node_id: number, model_id: number) => {
+    models.value = models.value.filter(
+      m => !(m.map_node_id === node_id && m.map_model_id === model_id)
+    );
   };
 
   // getter

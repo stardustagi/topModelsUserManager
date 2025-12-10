@@ -27,7 +27,8 @@
 
     <el-scrollbar :style="{ height: scrollbarHeight }" class="market-scrollbar">
       <div class="models-grid">
-        <div v-for="r in filteredRules" :key="r.id" class="model-card">
+        <!-- <div v-for="r in filteredRules" :key="r.id" class="model-card"> -->
+        <div v-for="r in filteredRules" :key="r.map_node_id + '-' + r.map_model_id" class="model-card">
           <div class="card-header">
             <h3 class="model-name">{{ r.name }}</h3>
             <!-- <el-tag type="success" size="small" class="provider-tag">
@@ -91,11 +92,7 @@ import {
   subscribeModelApi,
   getModelMarketApi,
   userGetSelectLLMInfo,
-  getModelKeysApi,
-  getModelDelayApi,
-  //   userSetPrivateModelApi,
 } from "@/api/managerApi";
-// import { currentUserId, getCurUserModel, setCurUserModel } from "@/composables/auth";
 import type { modelMarketEntity } from "@/store/modelMarektEntity";
 import { useRouter } from "vue-router";
 import { useMyModelStore } from "@/store/myModelsStore";
@@ -103,11 +100,11 @@ import type { ModelEntity, ModelMarketDTO, ModelMarketResp } from "@/api/apiPara
 import { type MyKeyItem, useMyKeysStore } from "@/store/myKeyStore";
 import { ElMessage } from "element-plus";
 import { getToken } from "@/utils/auth";
+import { useLatencyStore } from "@/store/latencyStore";
 
 const myModelStore = useMyModelStore();
 const router = useRouter();
 const scrollbarHeight = ref("500px"); // 默认高度
-const apiKeysStore = useMyKeysStore();
 
 // 搜索和排序
 const searchQuery = ref("");
@@ -132,6 +129,8 @@ const pagination = reactive({
   total: 0,
   sort: "", // im.id
 });
+
+const latencyStore = useLatencyStore();
 
 // 计算属性：过滤 + 排序
 const filteredRules = computed(() => {
@@ -202,7 +201,7 @@ const getMyModelList = async (del: boolean) => {
         for (let i = 0; i < resp.data.models_config.length; i++) {
           const rule = resp.data.models_config[i];
           const reqRule: ModelEntity = {
-            id: rule.map_id,
+            // id: rule.map_id,
             name: rule.model_name,
             provider: "",
             address: rule.domain,
@@ -212,6 +211,8 @@ const getMyModelList = async (del: boolean) => {
             latency: 0,
             health_score: 0,
             last_updated: rule.last_update,
+            map_node_id: rule.map_node_id,
+            map_model_id: rule.map_model_id,
           };
           modelInfos.value.push(reqRule);
           useMyModelStore().addMyModel(reqRule);
@@ -220,7 +221,7 @@ const getMyModelList = async (del: boolean) => {
     }
   }
   await getModelList();
-  await modelDelay();
+  await loadLatency();
 };
 
 // 切换模型类型,模型市场不变，私有模型后，清理我的模型，返回得到私有的模型
@@ -252,8 +253,6 @@ const getModelList = async () => {
 
   const respMarktes = await getModelMarketApi(params);
   console.log("markets === ", respMarktes);
-  console.log("markets ===1 ", typeof respMarktes.data.length);
-  console.log("--------- ", modelInfos.value)
   if (respMarktes.errcode === 0) {
     // 不存储在store
     rules.value = [];
@@ -261,28 +260,11 @@ const getModelList = async () => {
       for (let i = 0; i < respMarktes.data[0].length; i++) {
         let dto: ModelMarketDTO = respMarktes.data[0][i];
 
-        let hasSub: boolean = isModleExistSubscribe(dto.info_id, dto.info_name);
+        let hasSub: boolean = isModleExistSubscribe(dto.map_node_id, dto.map_model_id,);
         console.log("has sub === ", hasSub, "   ", dto);
-        // if (dto.provider_deleted !== 0) {
-        //   // 取供应商数据
-        //   let mme: modelMarketEntity = {
-        //     id: dto.info_model_id,
-        //     provider: dto.provider_provider_id,
-        //     name: dto.provider_name,
-        //     address: dto.provider_endpoint,
-        //     input_price: dto.provider_input_price,
-        //     output_price: dto.provider_output_price,
-        //     cache_price: dto.provider_cache_price,
-        //     latency: 0,
-        //     health_score: 0,
-        //     last_updated: dto.provider_last_update,
-        //     subscribed: hasSub,
-        //   };
-        //   rules.value.push(mme);
-        // } else {
         // 取自己模型数据
         let mme: modelMarketEntity = {
-          id: dto.info_id,
+          // id: dto.info_id,
           provider: dto.provider_provider_id,
           name: dto.info_name,
           address: dto.info_address,
@@ -293,6 +275,8 @@ const getModelList = async () => {
           health_score: 0,
           last_updated: dto.info_last_update,
           subscribed: hasSub,
+          map_node_id: dto.map_node_id,
+          map_model_id: dto.map_model_id,
         };
         rules.value.push(mme);
         // }
@@ -309,14 +293,10 @@ const getModelList = async () => {
 
 
 // 是否已经订阅了
-const isModleExistSubscribe = (id: number, name: string) => {
-  console.log("models info name = ", name);
-  for (let i = 0; i < modelInfos.value.length; i++) {
-    if (modelInfos.value[i].name === name) {
-      return true;
-    }
-  }
-  return false;
+const isModleExistSubscribe = (mapNodeId: number, mapModelId: number) => {
+  return modelInfos.value.some(m =>
+    m.map_node_id === mapNodeId && m.map_model_id === mapModelId
+  );
 };
 
 // 排序时候，回到第一页
@@ -344,28 +324,24 @@ const onClickSubscribe = async (rule: modelMarketEntity) => {
     return;
   }
 
-  let ids: Array<number> = [];
-  const existModels = useMyModelStore().models;
-  if (existModels && existModels.length > 0) {
-    for (let i = 0; i < existModels.length; i++) {
-      if (rule.name === existModels[i].name) {
-        ElMessage.warning("模型已经订阅过");
-        return;
-      } else {
-        ids.push(existModels[i].id);
-      }
-    }
-  }
-  ids.push(rule.id);
+  // 找出当前 node_id 下的所有已订阅模型 ID（排除重复）
+  const nodeIdStr = String(rule.map_node_id);
 
-  let model_ids: string[] = ids.map(id => id.toString());
+  const sameNodeModelIds = modelInfos.value
+    .filter(m => m.map_node_id === rule.map_node_id)
+    .map(m => String(m.map_model_id));
 
+  // 包含当前点击的 model_id
+  const fullModelIdsSet = new Set(sameNodeModelIds);
+  fullModelIdsSet.add(String(rule.map_model_id));
 
-  let usreq: UserSaveSelectLLMInfoReq = {
+  const model_ids = Array.from(fullModelIdsSet);
+
+  const usreq: UserSaveSelectLLMInfoReq = {
     user_id: Number(userId),
     select_models: [
       {
-        node_id: "",
+        node_id: nodeIdStr,
         model_ids: model_ids,
       },
     ],
@@ -374,7 +350,7 @@ const onClickSubscribe = async (rule: modelMarketEntity) => {
   if (res1.errcode === 0) {
     // 发送订阅
     const reqRule: ModelEntity = {
-      id: rule.id,
+      // id: rule.id,
       name: rule.name,
       provider: rule.provider,
       address: rule.address,
@@ -384,11 +360,17 @@ const onClickSubscribe = async (rule: modelMarketEntity) => {
       latency: rule.latency,
       health_score: rule.health_score,
       last_updated: rule.last_updated,
+      map_node_id: rule.map_node_id,
+      map_model_id: rule.map_model_id,
     };
 
     console.log(reqRule, "111");
 
-    const idx = rules.value.findIndex((item) => item.id === rule.id);
+    const idx = rules.value.findIndex(
+      item =>
+        item.map_node_id === rule.map_node_id &&
+        item.map_model_id === rule.map_model_id
+    );
     if (idx !== -1) {
       rules.value[idx] = {
         ...rules.value[idx],
@@ -420,35 +402,22 @@ const formatTime = (timestamp: number) => {
   return date.toLocaleString();
 };
 
-const modelDelay = async () => {
-  rules.value = rules.value.map((r) => {
-    const delay = delayMap.value[r.name] || 0;
-    return {
-      ...r,
-      latency: delay > 0 ? delay : getRandomLatency(), // 如果没有则随机
-    };
-  });
+// 获取延迟数据
+const loadLatency = async () => {
+  const nodeIds = Array.from(
+    new Set(rules.value.map(r => r.map_node_id).filter(id => !!id))
+  );
 
-  // const res = await getModelDelayApi();
-  // if (res.errcode === 0 && res.data && Array.isArray(res.data)) {
-  //   // 假设返回是 [{ name: "gpt-4", delay: 250 }, ...]
-  //   for (const item of res.data) {
-  //     delayMap.value[item.name] = item.delay || 0;
-  //   }
+  console.log("node ids === ", nodeIds);
 
-  //   // 更新 rules 列表中的 latency 值
-  //   rules.value = rules.value.map((r) => {
-  //     const delay = delayMap.value[r.name] || 0;
-  //     return {
-  //       ...r,
-  //       latency: delay > 0 ? delay : getRandomLatency(), // 如果没有则随机
-  //     };
-  //   });
-  // }
-}
-const getRandomLatency = (): number => {
-  return Math.floor(Math.random() * 13) + 7; // [7, 10]
+  await latencyStore.loadLatency(nodeIds);
+
+  rules.value = rules.value.map(r => ({
+    ...r,
+    latency: latencyStore.getLatency(r.map_node_id)
+  }));
 };
+
 </script>
 
 

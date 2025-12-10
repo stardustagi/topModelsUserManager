@@ -79,6 +79,8 @@ export interface ModelMarketDTO {
   info_cache_price: number;
   info_status: string;
   info_last_update: number;
+  map_node_id: number;
+  map_model_id: number;
 
   provider_id: number;
   provider_node_id: string;
@@ -111,8 +113,8 @@ export interface UnSubscribeModelResp {}
 // 我的模型列表
 export interface UserSelectModelDTO {
   map_id: number;
-  model_id: string;
-  node_id: string;
+  map_model_id: number;
+  map_node_id: number;
   model_name: string;
   api_version: string;
   deploy_name: string;
@@ -134,7 +136,7 @@ export interface UserSelectModelResp {
 
 // 模型实体
 export interface ModelEntity {
-  id: number;
+  // id: number;
   name: string;
   provider: string;
   address: string;
@@ -144,4 +146,6 @@ export interface ModelEntity {
   latency: number;
   health_score: number;
   last_updated: number;
+  map_node_id: number;
+  map_model_id: number;
 }

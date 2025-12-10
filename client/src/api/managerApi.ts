@@ -102,6 +102,15 @@ export const getModelMarketApi = (data?: object) => {
   });
 };
 
+// 获取模型的延迟
+export const getModelDelayApi = (data?: object) => {
+  return http.request<BaseResponse<DefaultResp>>(
+    "post",
+    baseUrlApi("/user/userGetNodesStatus"),
+    { data }
+  );
+};
+
 // 订阅模型
 export const subscribeModelApi = (data?: object) => {
   return http.request<BaseResponse<SubscribeModelResp>>(
@@ -155,6 +164,33 @@ export const apikeyLoginApi = (data?: object) => {
   );
 };
 
+// 模型分组
+export const upsertUserModeGroupApi = (data?: object) => {
+  return http.request<BaseResponse<DefaultResp>>(
+    "post",
+    baseUrlApi("/user/upsertUserModeGroup"),
+    { data }
+  );
+};
+
+// 获取模型分组
+export const getUserModeGroupsApi = (data?: object) => {
+  return http.request<BaseResponse<DefaultResp>>(
+    "post",
+    baseUrlApi("/user/getUserModeGroups"),
+    { data }
+  );
+};
+
+// 删除模型分组
+export const deleteUserModeGroupApi = (data?: object) => {
+  return http.request<BaseResponse<DefaultResp>>(
+    "post",
+    baseUrlApi("/user/deleteUserModeGroup"),
+    { data }
+  );
+};
+
 // 统计相关
 
 // 实时用量查询
@@ -204,15 +240,6 @@ export const detailExportApi = (data?: object) => {
 
 // 多APIKey聚合统计
 export const apiKeyAggregateApi = (data?: object) => {
-  return http.request<BaseResponse<DefaultResp>>(
-    "get",
-    baseUrlApi("/v1/usage/api-key-aggregate", "stats"),
-    { data }
-  );
-};
-
-// 获取模型的延迟
-export const getModelDelayApi = (data?: object) => {
   return http.request<BaseResponse<DefaultResp>>(
     "get",
     baseUrlApi("/v1/usage/api-key-aggregate", "stats"),

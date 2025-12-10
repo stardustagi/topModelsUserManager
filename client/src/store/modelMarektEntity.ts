@@ -1,5 +1,5 @@
 export interface modelMarketEntity {
-  id: number;
+  // id: number;
   name: string;
   // provider: ProviderDTO[];
   provider: string;
@@ -12,4 +12,6 @@ export interface modelMarketEntity {
   // tokens_per_sec: number;
   last_updated: number;
   subscribed: boolean;
+  map_node_id: number;
+  map_model_id: number;
 }
