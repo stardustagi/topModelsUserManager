@@ -149,3 +149,68 @@ export interface ModelEntity {
   map_node_id: number;
   map_model_id: number;
 }
+
+// 用户消费记录
+export interface UserConsumeRecordInfo {
+  id: number;
+  user_id: number;
+  node_id: number;
+  discount_amount: number;
+  total_consumed: number;
+  caller: string;
+  model: string;
+  model_id: number;
+  actual_provider: string;
+  actual_provider_id: string;
+  consume_type: string;
+  total_cost: number;
+  created: number;
+  updated: number;
+}
+
+export interface UserConsumeRecordResp {
+  records: UserConsumeRecordInfo[];
+  total: number;
+}
+
+// 消费明细
+export interface UserConsumeDetailText {
+  id: number;
+  consume_id: number;
+
+  input_tokens: number;
+  output_tokens: number;
+  cache_tokens: number;
+
+  input_price: number;
+  output_price: number;
+  cache_price: number;
+
+  created: number;
+}
+export interface UserConsumeDetailImage {
+  id: number;
+  consume_id: number;
+
+  quality: string;
+  size: string;
+
+  created: number;
+}
+export interface UserConsumeDetailVideo {
+  id: number;
+  consume_id: number;
+
+  Seconds: number; // 必须大写 S
+  size: string;
+
+  created: number;
+}
+export interface UserConsumeDetailResp {
+  consume_record: UserConsumeRecordInfo;
+  details:
+    | UserConsumeDetailText[]
+    | UserConsumeDetailImage[]
+    | UserConsumeDetailVideo[];
+  total: number;
+}

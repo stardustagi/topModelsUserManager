@@ -53,7 +53,8 @@ export default {
       name: "MyModel",
       component: () => import("@/views/console/person_center/mymodel.vue"),
       meta: {
-        title: "我的模型"
+        title: "我的模型",
+        showLink: false
       }
     }
   ]

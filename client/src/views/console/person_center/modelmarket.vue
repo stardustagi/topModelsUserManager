@@ -65,12 +65,12 @@
             <div class="model-meta">
               <span class="update-time">更新于: {{ formatTime(r.last_updated) }}</span>
             </div>
-            <el-button v-if="r.subscribed" class="subscribe-btn" type="primary" size="large">
+            <!-- <el-button v-if="r.subscribed" class="subscribe-btn" type="primary" size="large">
               已订阅
             </el-button>
             <el-button v-else class="subscribe-btn" type="primary" size="large" @click="onClickSubscribe(r)">
               订阅模型
-            </el-button>
+            </el-button> -->
           </div>
         </div>
       </div>
@@ -307,82 +307,82 @@ const handleSortChange = (val: string) => {
 };
 
 // 订阅模型
-const onClickSubscribe = async (rule: modelMarketEntity) => {
-  if (modelType.value !== "0") {
-    ElMessage.warning('请切换到公有模型在订阅');
-    return;
-  }
-  console.log("ruleId === ", rule);
-  // 验证模型是否存在 暂时不做
+// const onClickSubscribe = async (rule: modelMarketEntity) => {
+//   if (modelType.value !== "0") {
+//     ElMessage.warning('请切换到公有模型在订阅');
+//     return;
+//   }
+//   console.log("ruleId === ", rule);
+//   // 验证模型是否存在 暂时不做
 
-  console.log(myModelStore.models);
+//   console.log(myModelStore.models);
 
-  // 发送给中心服务器
-  const userId = getToken().userId;
-  if (!userId) {
-    router.push("/login");
-    return;
-  }
+//   // 发送给中心服务器
+//   const userId = getToken().userId;
+//   if (!userId) {
+//     router.push("/login");
+//     return;
+//   }
 
-  // 找出当前 node_id 下的所有已订阅模型 ID（排除重复）
-  const nodeIdStr = String(rule.map_node_id);
+//   // 找出当前 node_id 下的所有已订阅模型 ID（排除重复）
+//   const nodeIdStr = String(rule.map_node_id);
 
-  const sameNodeModelIds = modelInfos.value
-    .filter(m => m.map_node_id === rule.map_node_id)
-    .map(m => String(m.map_model_id));
+//   const sameNodeModelIds = modelInfos.value
+//     .filter(m => m.map_node_id === rule.map_node_id)
+//     .map(m => String(m.map_model_id));
 
-  // 包含当前点击的 model_id
-  const fullModelIdsSet = new Set(sameNodeModelIds);
-  fullModelIdsSet.add(String(rule.map_model_id));
+//   // 包含当前点击的 model_id
+//   const fullModelIdsSet = new Set(sameNodeModelIds);
+//   fullModelIdsSet.add(String(rule.map_model_id));
 
-  const model_ids = Array.from(fullModelIdsSet);
+//   const model_ids = Array.from(fullModelIdsSet);
 
-  const usreq: UserSaveSelectLLMInfoReq = {
-    user_id: Number(userId),
-    select_models: [
-      {
-        node_id: nodeIdStr,
-        model_ids: model_ids,
-      },
-    ],
-  };
-  const res1 = await subscribeModelApi(usreq);
-  if (res1.errcode === 0) {
-    // 发送订阅
-    const reqRule: ModelEntity = {
-      // id: rule.id,
-      name: rule.name,
-      provider: rule.provider,
-      address: rule.address,
-      input_price: rule.input_price,
-      output_price: rule.output_price,
-      cache_price: rule.cache_price,
-      latency: rule.latency,
-      health_score: rule.health_score,
-      last_updated: rule.last_updated,
-      map_node_id: rule.map_node_id,
-      map_model_id: rule.map_model_id,
-    };
+//   const usreq: UserSaveSelectLLMInfoReq = {
+//     user_id: Number(userId),
+//     select_models: [
+//       {
+//         node_id: nodeIdStr,
+//         model_ids: model_ids,
+//       },
+//     ],
+//   };
+//   const res1 = await subscribeModelApi(usreq);
+//   if (res1.errcode === 0) {
+//     // 发送订阅
+//     const reqRule: ModelEntity = {
+//       // id: rule.id,
+//       name: rule.name,
+//       provider: rule.provider,
+//       address: rule.address,
+//       input_price: rule.input_price,
+//       output_price: rule.output_price,
+//       cache_price: rule.cache_price,
+//       latency: rule.latency,
+//       health_score: rule.health_score,
+//       last_updated: rule.last_updated,
+//       map_node_id: rule.map_node_id,
+//       map_model_id: rule.map_model_id,
+//     };
 
-    console.log(reqRule, "111");
+//     console.log(reqRule, "111");
 
-    const idx = rules.value.findIndex(
-      item =>
-        item.map_node_id === rule.map_node_id &&
-        item.map_model_id === rule.map_model_id
-    );
-    if (idx !== -1) {
-      rules.value[idx] = {
-        ...rules.value[idx],
-        subscribed: true,
-      };
-    }
+//     const idx = rules.value.findIndex(
+//       item =>
+//         item.map_node_id === rule.map_node_id &&
+//         item.map_model_id === rule.map_model_id
+//     );
+//     if (idx !== -1) {
+//       rules.value[idx] = {
+//         ...rules.value[idx],
+//         subscribed: true,
+//       };
+//     }
 
-    myModelStore.addMyModel(reqRule);
-  } else {
-    ElMessage.warning("订阅失败");
-  }
-};
+//     myModelStore.addMyModel(reqRule);
+//   } else {
+//     ElMessage.warning("订阅失败");
+//   }
+// };
 
 // 获取视口高度并设置滚动条高度
 const setScrollbarHeight = () => {

@@ -11,16 +11,9 @@
     </div>
 
     <el-scrollbar :style="{ height: scrollbarHeight }" class="models-scrollbar">
-      <!-- <VueDraggableNext v-model="myModelInfos" group="models" handle=".drag-handle"> -->
       <div v-for="r in myModelInfos" :key="r.map_node_id + '-' + r.map_model_id" class="model-card">
         <div class="card-header">
-          <!-- <el-icon class="drag-handle">
-              <Rank />
-            </el-icon> -->
           <h3 class="model-name">{{ r.name }}</h3>
-          <!-- <el-tag type="primary" size="small" class="provider-tag">
-              {{ r.provider }}
-            </el-tag> -->
         </div>
 
         <div class="model-details">
@@ -51,7 +44,6 @@
           </el-button>
         </div>
       </div>
-      <!-- </VueDraggableNext> -->
     </el-scrollbar>
   </el-main>
 </template>

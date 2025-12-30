@@ -9,6 +9,8 @@ import {
   ModelMarketResp,
   SubscribeModelResp,
   UserAkSkResp,
+  UserConsumeDetailResp,
+  UserConsumeRecordResp,
   UserSelectModelResp
 } from "./apiParamsResp";
 import { baseUrlApi } from "./utils";
@@ -243,6 +245,24 @@ export const apiKeyAggregateApi = (data?: object) => {
   return http.request<BaseResponse<DefaultResp>>(
     "get",
     baseUrlApi("/v1/usage/api-key-aggregate", "stats"),
+    { data }
+  );
+};
+
+// 用户消费清单
+export const getUserConsumeRecordApi = (data?: object) => {
+  return http.request<BaseResponse<UserConsumeRecordResp>>(
+    "post",
+    baseUrlApi("/user/getUserConsumeRecord"),
+    { data }
+  );
+};
+
+// 明细数据
+export const getUserConsumeDetailApi = (data?: object) => {
+  return http.request<BaseResponse<UserConsumeDetailResp>>(
+    "post",
+    baseUrlApi("/user/getUserConsumeDetail"),
     { data }
   );
 };
