@@ -261,7 +261,7 @@ const getModelList = async () => {
         let dto: ModelMarketDTO = respMarktes.data[0][i];
 
         let hasSub: boolean = isModleExistSubscribe(dto.map_node_id, dto.map_model_id,);
-        console.log("has sub === ", hasSub, "   ", dto);
+        // console.log("has sub === ", hasSub, "   ", dto);
         // 取自己模型数据
         let mme: modelMarketEntity = {
           // id: dto.info_id,
