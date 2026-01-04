@@ -134,7 +134,18 @@ const latencyStore = useLatencyStore();
 
 // 计算属性：过滤 + 排序
 const filteredRules = computed(() => {
-  let data = [...rules.value];
+  console.log("-------------------------------------1111111111")
+  // let data = [...rules.value];
+
+  let data = rules.value.map(r => ({
+    ...r,
+    latency: latencyStore.getLatency(r.map_node_id)
+  }));
+
+  for (let i = 0; i < rules.value.length; i++) {
+    console.log(rules.value[i].latency, "        111")
+  }
+
 
   // 搜索过滤
   if (searchQuery.value.trim()) {
@@ -177,49 +188,49 @@ const getMyModelList = async (del: boolean) => {
 
   console.log("0000000000000000   拉取我的模型=", res);
 
-  let ask: boolean = false;
-  if (del) {
-    ask = true;
-    modelInfos.value = [];
-  } else {
-    if (res && res.length > 0) {
-      modelInfos.value = res;
-    } else {
-      ask = true;
-    }
-  }
-  if (ask) {
-    let params = {
-      skip: 0,
-      limit: 10000,
-      sort: ""
-    }
-    const resp = await userGetSelectLLMInfo(params);
-    if (resp.errcode === 0) {
-      console.log("当前模型是: ", resp.data);
-      if (resp.data && resp.data.models_config && resp.data.models_config.length > 0) {
-        for (let i = 0; i < resp.data.models_config.length; i++) {
-          const rule = resp.data.models_config[i];
-          const reqRule: ModelEntity = {
-            // id: rule.map_id,
-            name: rule.model_name,
-            provider: "",
-            address: rule.domain,
-            input_price: rule.model_input_price,
-            output_price: rule.model_output_price,
-            cache_price: rule.model_cache_price,
-            latency: 0,
-            health_score: 0,
-            last_updated: rule.last_update,
-            map_node_id: rule.map_node_id,
-            map_model_id: rule.map_model_id,
-          };
-          modelInfos.value.push(reqRule);
-          useMyModelStore().addMyModel(reqRule);
-        }
-      }
-    }
-  }
+  // let ask: boolean = false;
+  // if (del) {
+  //   ask = true;
+  //   modelInfos.value = [];
+  // } else {
+  //   if (res && res.length > 0) {
+  //     modelInfos.value = res;
+  //   } else {
+  //     ask = true;
+  //   }
+  // }
+  // if (ask) {
+  //   let params = {
+  //     skip: 0,
+  //     limit: 10000,
+  //     sort: ""
+  //   }
+  //   const resp = await userGetSelectLLMInfo(params);
+  //   if (resp.errcode === 0) {
+  //     console.log("当前模型是: ", resp.data);
+  //     if (resp.data && resp.data.models_config && resp.data.models_config.length > 0) {
+  //       for (let i = 0; i < resp.data.models_config.length; i++) {
+  //         const rule = resp.data.models_config[i];
+  //         const reqRule: ModelEntity = {
+  //           // id: rule.map_id,
+  //           name: rule.model_name,
+  //           provider: "",
+  //           address: rule.domain,
+  //           input_price: rule.model_input_price,
+  //           output_price: rule.model_output_price,
+  //           cache_price: rule.model_cache_price,
+  //           latency: 0,
+  //           health_score: 0,
+  //           last_updated: rule.last_update,
+  //           map_node_id: rule.map_node_id,
+  //           map_model_id: rule.map_model_id,
+  //         };
+  //         modelInfos.value.push(reqRule);
+  //         useMyModelStore().addMyModel(reqRule);
+  //       }
+  //     }
+  //   }
+  // }
   await getModelList();
   await loadLatency();
 };
@@ -412,10 +423,16 @@ const loadLatency = async () => {
 
   await latencyStore.loadLatency(nodeIds);
 
-  rules.value = rules.value.map(r => ({
-    ...r,
-    latency: latencyStore.getLatency(r.map_node_id)
-  }));
+
+  // for (const r of rules.value) {
+  //   const v = latencyStore.getLatency(r.map_node_id);
+  //   console.log("vvvvvvvvvvvvvvvvvvvvvvv === ", v)
+  //   if (v !== undefined && v !== null) {
+  //     console.log("33333")
+  //     r.latency = v;   // 🔥 这里是关键
+  //   }
+  // }
+  rules.value = [...rules.value];
 };
 
 </script>

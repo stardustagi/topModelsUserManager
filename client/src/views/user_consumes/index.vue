@@ -32,13 +32,13 @@
                 <el-table-column label="服务商" width="140">
                     <template #default="{ row }">
                         <el-tag effect="plain">
-                            {{ row.actual_provider || "-" }}
+                            {{ row.ActualProvider || "-" }}
                         </el-tag>
                     </template>
                 </el-table-column>
 
                 <!-- 服务协议 -->
-                <el-table-column label="服务协议" min-width="180">
+                <!-- <el-table-column label="服务协议" min-width="180">
                     <template #default="{ row }">
                         <el-tooltip v-if="row.actual_provider_id" :content="row.actual_provider_id" placement="top">
                             <el-tag type="info" class="truncate max-w-[160px]">
@@ -47,12 +47,12 @@
                         </el-tooltip>
                         <span v-else>-</span>
                     </template>
-                </el-table-column>
+                </el-table-column> -->
 
                 <!-- 金额 -->
                 <el-table-column label="消费金额">
                     <template #default="{ row }">
-                        {{ (row.total_consumed / 100).toFixed(2) }}
+                        {{ (row.total_consumed / 1000000).toFixed(6) }}元
                     </template>
                 </el-table-column>
 
@@ -86,13 +86,13 @@
 
                 <el-table-column label="输入费用">
                     <template #default="{ row }">
-                        {{ (row.input_tokens * row.input_price / 100).toFixed(4) }}
+                        {{ (row.input_tokens * row.input_price / 1000000).toFixed(6) }}元
                     </template>
                 </el-table-column>
 
                 <el-table-column label="输出费用">
                     <template #default="{ row }">
-                        {{ (row.output_tokens * row.output_price / 100).toFixed(4) }}
+                        {{ (row.output_tokens * row.output_price / 1000000).toFixed(6) }}元
                     </template>
                 </el-table-column>
 
@@ -149,7 +149,7 @@ const detailType = ref<"text" | "image" | "video">("text");
 const query = reactive({
     consume_type: "text",
     page: {
-        page: 1,
+        skip: 0,
         limit: 20
     }
 });
@@ -159,6 +159,7 @@ const total = ref(0);
 
 
 const fetchList = async () => {
+    query.page.skip = query.page.skip ?? 0;
     const res = await getUserConsumeRecordApi(query);
     console.log("res record =============", res)
     list.value = res.data.records;
@@ -166,7 +167,7 @@ const fetchList = async () => {
 };
 
 const handlePageChange = (page: number) => {
-    query.page.page = page;
+    query.page.skip = (page - 1) * query.page.limit;
     fetchList();
 };
 
@@ -180,7 +181,7 @@ const detailQuery = reactive({
     consume_id: 0,
     consume_type: "text",
     page: {
-        page: 1,
+        skip: 0,
         limit: 10
     }
 });
@@ -188,7 +189,7 @@ const detailQuery = reactive({
 const openDetail = async (row: any) => {
     detailQuery.consume_id = row.id;
     detailQuery.consume_type = row.consume_type;
-    detailQuery.page.page = 1;
+    detailQuery.page.skip = 0;
     detailVisible.value = true;
     await fetchDetail();
 };
@@ -207,7 +208,7 @@ const fetchDetail = async () => {
 };
 
 const handleDetailPageChange = (page: number) => {
-    detailQuery.page.page = page;
+    detailQuery.page.skip = (page - 1) * detailQuery.page.limit;
     fetchDetail();
 };
 

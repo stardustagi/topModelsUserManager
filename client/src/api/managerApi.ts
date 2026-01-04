@@ -2,6 +2,7 @@ import { http } from "@/utils/http";
 import {
   BaseResponse,
   CompanyInfoResp,
+  DayReportResp,
   DefaultResp,
   GetModelTokenResp,
   ImageCodeResp,
@@ -263,6 +264,15 @@ export const getUserConsumeDetailApi = (data?: object) => {
   return http.request<BaseResponse<UserConsumeDetailResp>>(
     "post",
     baseUrlApi("/user/getUserConsumeDetail"),
+    { data }
+  );
+};
+
+// 日报
+export const getDailyReportApi = (data?: object) => {
+  return http.request<BaseResponse<DayReportResp>>(
+    "post",
+    baseUrlApi("/user/getUsersDayReport"),
     { data }
   );
 };

@@ -214,3 +214,17 @@ export interface UserConsumeDetailResp {
     | UserConsumeDetailVideo[];
   total: number;
 }
+
+// 日报
+export interface DayReportItem {
+  day: string;
+  request_count: number;
+  success_count: number;
+  fail_count: number;
+  cost: number;
+}
+
+export interface DayReportResp {
+  items: DayReportItem[];
+  total: number;
+}

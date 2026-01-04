@@ -6,7 +6,7 @@ export default {
   redirect: "/user_consumes/index",
   meta: {
     icon: "ri/information-line",
-    title: "消费明细",
+    title: "数据统计",
     rank: 11,
     showLink: true
   },
@@ -17,6 +17,14 @@ export default {
       component: () => import("@/views/user_consumes/index.vue"),
       meta: {
         title: "消费明细"
+      }
+    },
+    {
+      path: "dailyReport",
+      name: "DailyReport",
+      component: () => import("@/views/user_consumes/daily_report.vue"),
+      meta: {
+        title: "日报"
       }
     }
   ]
