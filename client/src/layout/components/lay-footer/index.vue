@@ -5,13 +5,15 @@ const TITLE = getConfig("Title");
 </script>
 
 <template>
-  <footer
-    class="layout-footer text-[rgba(0,0,0,0.6)] dark:text-[rgba(220,220,242,0.8)]"
-  >
+  <footer class="layout-footer text-[rgba(0,0,0,0.6)] dark:text-[rgba(220,220,242,0.8)]">
     Copyright © 2020-present
-    <a class="hover:text-primary!" href="#" target="_blank">
+    <!-- <a class="hover:text-primary!" href="#" target="_blank">
       &nbsp;{{ TITLE }}
-    </a>
+    </a> -->
+    <span class="hover:text-primary">
+      &nbsp;{{ TITLE }}
+    </span>
+
   </footer>
 </template>
 
